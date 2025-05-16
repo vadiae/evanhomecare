@@ -35,22 +35,23 @@ export function CustomNavbar() {
         {
             icon: <MdOutlineMedicalInformation />,
             label: "About Us",
-            href: pathName === "/" ? "#AboutUs" : "/#AboutUs",
+            href: "#AboutUs",
         },
         {
             icon: <MdOutlineMedicalServices />,
-            label: "Medicaid Waiver Services:",
-            href: pathName === "/" ? "#Services" : "/#Services",
+            label: "Medicaid Waiver Services",
+            href: "#Services",
         },
         {
             icon: <MdOutlineMedicalServices />,
-            label: "Homemaker & Companion ",
-            href: "/homemaker-companion",
+            label: "Homemaker & Companion",
+            target: "_blank",
+            href: "https://www.evanhomecareservices.com/",
         },
         {
             icon: <MdConnectWithoutContact />,
             label: "Contact Us",
-            href: pathName === "/" ? "#ContactUs" : "/#ContactUs",
+            href: "#ContactUs",
         },
         {
             icon: <SiReacthookform />,
@@ -79,9 +80,7 @@ export function CustomNavbar() {
             <NavbarContent className="hidden gap-8 sm:flex" justify="start">
                 <NavbarItem>
                     <Link
-                        className={`text-lg font-medium text-primary transition hover:text-gray-400 ${
-                            pathName == "/" ? "text-primary" : ""
-                        }`}
+                        className={`text-lg font-medium  text-primary transition hover:text-gray-400`}
                         href="/"
                     >
                         Home
@@ -111,7 +110,8 @@ export function CustomNavbar() {
                         <DropdownItem key="services" className="mt-1">
                             <Link
                                 className="transition hover:text-gray-400"
-                                href="/homemaker-companion"
+                                href="https://www.evanhomecareservices.com/"
+                                target="_blank"
                             >
                                 <p className="font-bold text-primary">
                                     Homemaker & Companion
@@ -132,11 +132,7 @@ export function CustomNavbar() {
 
                 <NavbarItem>
                     <Link
-                        className={`text-lg font-medium text-primary transition hover:text-gray-400 ${
-                            pathName.includes("employment")
-                                ? "text-primary"
-                                : ""
-                        }`}
+                        className={`text-lg font-medium text-primary transition hover:text-gray-400`}
                         href="/employment"
                     >
                         Employment
@@ -172,11 +168,7 @@ export function CustomNavbar() {
                         <Image
                             width={1024}
                             height={1024}
-                            src={
-                                pathName === "/homemaker-companion"
-                                    ? "/logo2.webp"
-                                    : "/logo.webp"
-                            }
+                            src={"/logo.webp"}
                             quality={100}
                             alt="Evan Home Care Logo"
                             className=" h-20 w-20 object-contain"
@@ -200,6 +192,7 @@ export function CustomNavbar() {
                                 pathName === item.href ? "text-primary" : ""
                             }`}
                             href={item.href}
+                            target={item.target || "_self"}
                             onClick={() => {
                                 setIsMenuOpen(false);
                             }}

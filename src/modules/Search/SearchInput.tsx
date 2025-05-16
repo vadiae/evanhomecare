@@ -1,7 +1,5 @@
 "use client";
 
-import React from "react";
-import { SearchIcon } from "@nextui-org/shared-icons";
 import {
     Button,
     Input,
@@ -12,12 +10,14 @@ import {
     ModalHeader,
     useDisclosure,
 } from "@nextui-org/react";
+import { SearchIcon } from "@nextui-org/shared-icons";
+import Link from "next/link";
+import React from "react";
 import dictionary, {
     type DictionaryResults,
     type DicType,
     type TextType,
 } from "~/dictionary/dictionaryLink";
-import Link from "next/link";
 
 export function SearchInput() {
     const { isOpen, onOpen, onClose } = useDisclosure();

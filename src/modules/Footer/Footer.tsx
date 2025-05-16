@@ -1,14 +1,13 @@
 "use client";
 
-import React from "react";
-import { IoMail } from "react-icons/io5";
-import { PiPhoneCallThin } from "react-icons/pi";
-import { LiaFaxSolid } from "react-icons/lia";
 import { ImLocation } from "react-icons/im";
-import { FooterActionsWrapper } from "./FooterWrapper";
+import { IoMail } from "react-icons/io5";
+import { LiaFaxSolid } from "react-icons/lia";
 import { MdOutlineBadge } from "react-icons/md";
+import { PiPhoneCallThin } from "react-icons/pi";
+import { FooterActionsWrapper } from "./FooterWrapper";
 
-export function Footer({ withActions = true }: { withActions?: boolean }) {
+export function Footer() {
     return (
         <div className="pt-16">
             <div className="custom-shape-divider-bottom-1702225207">
@@ -26,11 +25,9 @@ export function Footer({ withActions = true }: { withActions?: boolean }) {
             </div>
 
             <div className="mt-[-10px] bg-primary pb-8 pt-8 lg:pt-0">
-                {withActions && (
-                    <div className="mb-10">
-                        <FooterActionsWrapper />
-                    </div>
-                )}
+                <div className="mb-10">
+                    <FooterActionsWrapper />
+                </div>
 
                 <div className="px-4">
                     <div className="mt-[-40px] flex items-center justify-center py-10">
