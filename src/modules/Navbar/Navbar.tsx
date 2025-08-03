@@ -16,6 +16,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
+import { IoAnalytics } from "react-icons/io5";
 
 import { FaPlayCircle } from "react-icons/fa";
 import { IoHome } from "react-icons/io5";
@@ -62,6 +63,11 @@ export function CustomNavbar() {
             icon: <FaPlayCircle />,
             label: "Training",
             href: "/training",
+        },
+        {
+            icon: <IoAnalytics />,
+            label: "Analysis",
+            href: "/analysis",
         },
     ];
 
@@ -147,6 +153,17 @@ export function CustomNavbar() {
                         href="/training"
                     >
                         Training
+                    </Link>
+                </NavbarItem>
+
+                <NavbarItem>
+                    <Link
+                        className={`text-lg font-medium text-primary transition hover:text-gray-400 ${
+                            pathName.includes("analysis") ? "text-primary" : ""
+                        }`}
+                        href="/analysis"
+                    >
+                        Analysis
                     </Link>
                 </NavbarItem>
             </NavbarContent>

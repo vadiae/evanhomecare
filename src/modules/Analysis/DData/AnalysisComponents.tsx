@@ -4,8 +4,8 @@ import { Button, Card, CardBody, Chip, Spinner } from "@nextui-org/react";
 import React, { useRef, useState } from "react";
 import { FiDatabase, FiUpload } from "react-icons/fi";
 import { Title } from "~/components/Titles/Title";
-import DData from "~/modules/DData/DData";
-import TabsSection from "~/modules/DData/TabsSection";
+import DData from "~/modules/Analysis/DData/DData";
+import TabsSection from "~/modules/Analysis/DData/TabsSection";
 import { CustomNavbar } from "~/modules/Navbar/Navbar";
 
 interface JsonData {
@@ -16,7 +16,7 @@ interface JsonData {
     recordsAmount?: number;
 }
 
-export default function IConnectPage() {
+export default function AnalysisComponents() {
     const [isLoading, setIsLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [headers, setHeaders] = useState<string[]>([]);
@@ -75,7 +75,7 @@ export default function IConnectPage() {
                 <div className="w-full max-w-[1440px] px-5 pb-20 sm:px-10">
                     <div className="mx-auto max-w-7xl sm:py-10">
                         <Title
-                            title="iConnect JSON Data Viewer"
+                            title="Data Analysis"
                             subtitle="Upload, analyze, and visualize your JSON data"
                         />
 
