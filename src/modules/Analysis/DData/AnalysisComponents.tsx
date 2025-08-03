@@ -125,7 +125,7 @@ export const TotalServicesUnits: React.FC<TotalServicesUnitsProps> = ({
         const newMatrix = [...matrix];
 
         if (newMatrix[dayIndex]?.[typeIndex] !== undefined) {
-            newMatrix[dayIndex][typeIndex] = parseInt(value) || 0;
+            newMatrix[dayIndex]![typeIndex] = parseInt(value) || 0;
             setMatrix(newMatrix);
         }
     };
