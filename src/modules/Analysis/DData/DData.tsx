@@ -11,11 +11,11 @@ import {
 } from "@nextui-org/react";
 import { useState } from "react";
 import {
-    WaiverValidationErrors,
-    TotalServicesUnits,
-    ServicesGroupedByType,
     AssociatedServices,
     ServicesByDay,
+    ServicesGroupedByType,
+    TotalServicesUnits,
+    WaiverValidationErrors,
 } from "./AnalysisComponents";
 
 interface DataRow {
