@@ -5,30 +5,34 @@ import styles from "./home.module.css";
 export function HomeSection() {
     return (
         <div id="Home">
-            <div className="relative -mx-[calc((100vw-100%)/2)] overflow-hidden  py-32 lg:-mx-[calc((100vw-100%-15px)/2)]">
-                <div className="absolute inset-0 ">
+            <div className="relative -mx-[calc((100vw-100%)/2)] py-32 ">
+                <div className="absolute inset-0">
                     <svg
-                        className="h-full w-full"
                         preserveAspectRatio="none"
-                        viewBox="0 0 1440 800"
+                        viewBox="0 0 1440 240"
                         xmlns="http://www.w3.org/2000/svg"
+                        style={{ width: "100%", height: "120px" }}
                     >
                         <path
-                            d="M0 0C240 120 480 180 720 180C960 180 1200 120 1440 0V800H0V0Z"
                             fill="rgb(42, 128, 156)"
-                            className="animate-[wave_15s_ease-in-out_infinite]"
-                        >
-                            <animate
-                                attributeName="d"
-                                dur="15s"
-                                repeatCount="indefinite"
-                                values="
-                                    M0 0C240 120 480 180 720 180C960 180 1200 120 1440 0V680C1200 800 960 860 720 860C480 860 240 800 0 680V0Z;
-                                    M0 120C240 0 480 60 720 60C960 60 1200 0 1440 120V740C1200 620 960 680 720 680C480 680 240 620 0 740V120Z;
-                                    M0 0C240 120 480 180 720 180C960 180 1200 120 1440 0V680C1200 800 960 860 720 860C480 860 240 800 0 680V0Z
-                                "
-                            />
-                        </path>
+                            fillOpacity="1"
+                            d="M0,48L48,40C96,32,192,16,288,40C384,64,480,128,576,160C672,192,768,192,864,196C960,200,1056,208,1152,184C1248,160,1344,104,1392,76L1440,48L1440,240L1392,240C1344,240,1248,240,1152,240C1056,240,960,240,864,240C768,240,672,240,576,240C480,240,384,240,288,240C192,240,96,240,48,240L0,240Z"
+                        />
+                    </svg>
+
+                    <div className="h-[calc(100vw+50px)] w-full bg-primary sm:h-[600px] md:h-[320px] lg:h-[380px] xl:h-[430px]"></div>
+
+                    <svg
+                        preserveAspectRatio="none"
+                        viewBox="0 0 1440 160"
+                        xmlns="http://www.w3.org/2000/svg"
+                        style={{ width: "100%", height: "80px" }}
+                    >
+                        <path
+                            fill="rgb(42, 128, 156)"
+                            fillOpacity="1"
+                            d="M0,32L48,26.7C96,21,192,11,288,26.7C384,43,480,85,576,106.7C672,128,768,128,864,130.7C960,133,1056,139,1152,122.7C1248,107,1344,69,1392,50.7L1440,32L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"
+                        />
                     </svg>
                 </div>
                 <div className="relative mx-auto max-w-[1440px] px-4 md:px-8">

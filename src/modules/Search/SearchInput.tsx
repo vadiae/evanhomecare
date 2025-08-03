@@ -132,7 +132,7 @@ export function SearchInput() {
 
     return (
         <>
-            <div className="flex w-full gap-0 sm:w-max">
+            <div className="flex w-full gap-0 md:w-max">
                 <Input
                     isClearable
                     size="sm"

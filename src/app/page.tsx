@@ -13,13 +13,13 @@ export default async function Home() {
     return (
         <>
             <main>
-                <div className="hidden sm:block">
+                <div className="hidden md:block">
                     <TopSection />
                 </div>
 
                 <CustomNavbar />
 
-                <div className="mt-5 px-5 sm:hidden">
+                <div className="mt-5 px-5 md:hidden">
                     <SocialButtons />
                 </div>
 

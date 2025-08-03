@@ -83,7 +83,7 @@ export function CustomNavbar() {
             isMenuOpen={isMenuOpen}
             onMenuOpenChange={setIsMenuOpen}
         >
-            <NavbarContent className="hidden gap-8 sm:flex" justify="start">
+            <NavbarContent className="hidden gap-8 md:flex" justify="start">
                 <NavbarItem>
                     <Link
                         className={`text-lg font-medium  text-primary transition hover:text-gray-400`}
@@ -168,7 +168,7 @@ export function CustomNavbar() {
                 </NavbarItem>
             </NavbarContent>
 
-            <NavbarContent className="hidden sm:flex" justify="end">
+            <NavbarContent className="hidden md:flex" justify="end">
                 <NavbarItem>
                     <Link
                         className="rounded-lg bg-primary px-6 py-2.5 text-lg font-medium text-white transition hover:bg-primary/90"
@@ -179,7 +179,7 @@ export function CustomNavbar() {
                 </NavbarItem>
             </NavbarContent>
 
-            <NavbarContent className="sm:hidden" justify="start">
+            <NavbarContent className="md:hidden" justify="start">
                 <div className="flex w-full items-center justify-between ">
                     <NavbarItem>
                         <Image
