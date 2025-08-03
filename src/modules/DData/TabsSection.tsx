@@ -5,6 +5,7 @@ import {
     Card,
     CardBody,
     Chip,
+    Input,
     Table,
     TableBody,
     TableCell,
@@ -12,262 +13,210 @@ import {
     TableHeader,
     TableRow,
 } from "@nextui-org/react";
-import React, { useState } from "react";
-import { FiDatabase, FiDownload, FiEye, FiTable } from "react-icons/fi";
-
-interface TableInfo {
-    name: string;
-    columns: ColumnInfo[];
-    rowCount: number;
-}
-
-interface ColumnInfo {
-    name: string;
-    type: string;
-    notNull: boolean;
-    defaultValue: string | null;
-    primaryKey: boolean;
-}
-
-interface QueryResult {
-    columns: string[];
-    rows: any[][];
-    rowCount: number;
-}
+import { useState } from "react";
+import { FiDownload, FiEye, FiSearch, FiTable, FiUsers } from "react-icons/fi";
 
 interface TabsSectionProps {
-    tables: TableInfo[];
-    selectedTable: string;
-    tableData: QueryResult | null;
-    isLoading: boolean;
-    onTableSelect: (tableName: string) => void;
-    onDownloadData: (data: QueryResult, filename: string) => void;
+    distinctConsumerNames: string[];
+    rows: any[][];
 }
 
 export default function TabsSection({
-    tables,
-    selectedTable,
-    tableData,
-    isLoading,
-    onTableSelect,
-    onDownloadData,
+    distinctConsumerNames,
+    rows,
 }: TabsSectionProps) {
-    const [activeTab, setActiveTab] = useState<"tables" | "analysis">("tables");
+    const [activeTab, setActiveTab] = useState<
+        "consumers" | "data" | "general"
+    >("consumers");
     const [isVisible, setIsVisible] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
 
     const toggleVisibility = () => {
         setIsVisible(!isVisible);
     };
 
-    if (!tables.length) {
+    if (!distinctConsumerNames?.length && !rows?.length) {
         return null;
     }
 
-    if (!isVisible) {
-        return (
-            <div className="mb-6 mt-6">
-                <Button
-                    color="primary"
-                    variant="bordered"
-                    onClick={toggleVisibility}
-                    className="h-16 w-full text-lg font-semibold"
-                >
-                    Show Database Tables & Analysis
-                </Button>
-            </div>
-        );
-    }
+    const headers = rows[0] ? Object.keys(rows[0]) : [];
+
+    const filteredRows = rows.filter((row) =>
+        Object.values(row).some((value) =>
+            String(value).toLowerCase().includes(searchQuery.toLowerCase()),
+        ),
+    );
 
     return (
         <div className="mb-6 mt-6">
-            <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-800">
-                    Database Tables & Analysis
-                </h3>
-                <Button
-                    size="sm"
-                    color="secondary"
-                    variant="bordered"
-                    onClick={toggleVisibility}
-                >
-                    Hide
-                </Button>
-            </div>
-
             <div className="mb-6 flex flex-wrap gap-2">
                 <Button
-                    variant={activeTab === "tables" ? "solid" : "bordered"}
+                    variant={activeTab === "consumers" ? "solid" : "bordered"}
                     color="primary"
-                    startContent={<FiTable />}
-                    onClick={() => setActiveTab("tables")}
+                    startContent={<FiUsers />}
+                    onClick={() => setActiveTab("consumers")}
                 >
-                    Tables
+                    Consumers
                 </Button>
                 <Button
-                    variant={activeTab === "analysis" ? "solid" : "bordered"}
+                    variant={activeTab === "data" ? "solid" : "bordered"}
                     color="primary"
-                    startContent={<FiEye />}
-                    onClick={() => setActiveTab("analysis")}
+                    startContent={<FiTable />}
+                    onClick={() => setActiveTab("data")}
                 >
-                    Analysis
+                    Data
                 </Button>
             </div>
 
-            {activeTab === "tables" && (
-                <div className="grid gap-6 lg:grid-cols-3">
-                    <Card className="lg:col-span-1">
-                        <CardBody className="p-6">
-                            <h4 className="mb-4 text-lg font-semibold text-gray-800">
-                                Database Tables
+            {activeTab === "consumers" && (
+                <Card>
+                    <CardBody className="p-6">
+                        <div className="mb-4 flex items-center justify-between">
+                            <h4 className="text-lg font-semibold text-gray-800">
+                                Consumer Names
                             </h4>
-                            <div className="space-y-2">
-                                {tables.map((table) => (
-                                    <Button
-                                        key={table.name}
-                                        variant={
-                                            selectedTable === table.name
-                                                ? "solid"
-                                                : "bordered"
-                                        }
-                                        color="primary"
-                                        className="w-full justify-start"
-                                        onClick={() =>
-                                            onTableSelect(table.name)
-                                        }
-                                    >
-                                        <FiTable className="mr-2" />
-                                        {table.name}
-                                        <Chip
-                                            size="sm"
-                                            variant="flat"
-                                            className="ml-auto"
-                                        >
-                                            {table.rowCount}
-                                        </Chip>
-                                    </Button>
-                                ))}
-                            </div>
-                        </CardBody>
-                    </Card>
+                        </div>
 
-                    <Card className="lg:col-span-2">
-                        <CardBody className="p-6">
-                            <div className="mb-4 flex items-center justify-between">
-                                <h4 className="text-lg font-semibold text-gray-800">
-                                    {selectedTable} Table
-                                </h4>
-                                {tableData && (
-                                    <Button
-                                        size="sm"
-                                        color="secondary"
-                                        startContent={<FiDownload />}
-                                        onClick={() =>
-                                            onDownloadData(
-                                                tableData,
-                                                `${selectedTable}.csv`,
-                                            )
-                                        }
-                                    >
-                                        Export CSV
-                                    </Button>
-                                )}
-                            </div>
-
-                            {tableData && (
-                                <div className="max-h-96 overflow-auto">
-                                    <Table aria-label={`${selectedTable} data`}>
-                                        <TableHeader>
-                                            {tableData.columns.map((column) => (
-                                                <TableColumn key={column}>
-                                                    {column}
-                                                </TableColumn>
-                                            ))}
-                                        </TableHeader>
-                                        <TableBody>
-                                            {tableData.rows
-                                                .slice(0, 100)
-                                                .map((row, index) => (
-                                                    <TableRow key={index}>
-                                                        {Array.isArray(row)
-                                                            ? row.map(
-                                                                  (
-                                                                      cell,
-                                                                      cellIndex,
-                                                                  ) => (
-                                                                      <TableCell
-                                                                          key={
-                                                                              cellIndex
-                                                                          }
-                                                                      >
-                                                                          {cell !==
-                                                                              null &&
-                                                                          cell !==
-                                                                              undefined
-                                                                              ? String(
-                                                                                    cell,
-                                                                                )
-                                                                              : "NULL"}
-                                                                      </TableCell>
-                                                                  ),
-                                                              )
-                                                            : tableData.columns.map(
-                                                                  (
-                                                                      column,
-                                                                      cellIndex,
-                                                                  ) => (
-                                                                      <TableCell
-                                                                          key={
-                                                                              cellIndex
-                                                                          }
-                                                                      >
-                                                                          {row[
-                                                                              column
-                                                                          ] !==
-                                                                              null &&
-                                                                          row[
-                                                                              column
-                                                                          ] !==
-                                                                              undefined
-                                                                              ? String(
-                                                                                    row[
-                                                                                        column
-                                                                                    ],
-                                                                                )
-                                                                              : "NULL"}
-                                                                      </TableCell>
-                                                                  ),
-                                                              )}
-                                                    </TableRow>
-                                                ))}
-                                        </TableBody>
-                                    </Table>
-                                    {tableData.rows.length > 100 && (
-                                        <p className="mt-2 text-sm text-gray-500">
-                                            Showing first 100 rows of{" "}
-                                            {tableData.rowCount} total rows
-                                        </p>
-                                    )}
-                                </div>
-                            )}
-                        </CardBody>
-                    </Card>
-                </div>
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {distinctConsumerNames.map((name, index) => (
+                                <Card key={index} className="bg-primary/5">
+                                    <CardBody className="p-4">
+                                        <div className="flex items-center justify-between">
+                                            <span className="font-medium text-gray-800">
+                                                {name}
+                                            </span>
+                                            <Chip
+                                                size="sm"
+                                                variant="flat"
+                                                color="primary"
+                                            >
+                                                #{index + 1}
+                                            </Chip>
+                                        </div>
+                                    </CardBody>
+                                </Card>
+                            ))}
+                        </div>
+                        <p className="mt-4 text-sm text-gray-600">
+                            Total: {distinctConsumerNames.length} consumers
+                        </p>
+                    </CardBody>
+                </Card>
             )}
 
-            {activeTab === "analysis" && (
+            {activeTab === "data" && (
+                <Card>
+                    <CardBody className="p-6">
+                        <div className="mb-4 flex items-center justify-between">
+                            <h4 className="text-lg font-semibold text-gray-800">
+                                Data Records
+                            </h4>
+                            <Button
+                                size="sm"
+                                color="secondary"
+                                startContent={<FiDownload />}
+                                onClick={() => {
+                                    const csvContent = [
+                                        headers.join(","),
+                                        ...rows.map((row) =>
+                                            headers
+                                                .map(
+                                                    (header) =>
+                                                        `"${
+                                                            row[
+                                                                header as keyof typeof row
+                                                            ]
+                                                        }"`,
+                                                )
+                                                .join(","),
+                                        ),
+                                    ].join("\n");
+                                    const blob = new Blob([csvContent], {
+                                        type: "text/csv",
+                                    });
+                                    const url = URL.createObjectURL(blob);
+                                    const a = document.createElement("a");
+                                    a.href = url;
+                                    a.download = "data.csv";
+                                    a.click();
+                                    URL.revokeObjectURL(url);
+                                }}
+                            >
+                                Export CSV
+                            </Button>
+                        </div>
+
+                        <div className="mb-4 space-y-2 text-sm text-gray-500">
+                            <div className="flex flex-wrap gap-4">
+                                <p>Total Records: {rows?.length}</p>
+                                <p>Filtered Records: {filteredRows?.length}</p>
+                                <p>Columns: {headers?.length}</p>
+                            </div>
+                        </div>
+
+                        <div className="mb-4">
+                            <Input
+                                startContent={<FiSearch />}
+                                placeholder="Search in all columns..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full"
+                            />
+                        </div>
+
+                        <div className="max-h-96 overflow-auto">
+                            <Table aria-label="Data records">
+                                <TableHeader>
+                                    {headers.map((header) => (
+                                        <TableColumn key={header}>
+                                            {header}
+                                        </TableColumn>
+                                    ))}
+                                </TableHeader>
+                                <TableBody>
+                                    {filteredRows.map((row, index) => (
+                                        <TableRow key={index}>
+                                            {headers.map(
+                                                (header, cellIndex) => {
+                                                    const value =
+                                                        row[
+                                                            header as keyof typeof row
+                                                        ];
+                                                    return (
+                                                        <TableCell
+                                                            key={cellIndex}
+                                                        >
+                                                            {value !== null &&
+                                                            value !== undefined
+                                                                ? String(value)
+                                                                : "NULL"}
+                                                        </TableCell>
+                                                    );
+                                                },
+                                            )}
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </CardBody>
+                </Card>
+            )}
+
+            {activeTab === "general" && (
                 <div className="grid gap-6 lg:grid-cols-2">
                     <Card>
                         <CardBody className="p-6">
                             <h4 className="mb-4 text-lg font-semibold text-gray-800">
-                                Database Overview
+                                Data Overview
                             </h4>
                             <div className="space-y-3">
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">
-                                        Total Tables:
+                                        Total Consumers:
                                     </span>
                                     <span className="font-semibold">
-                                        {tables.length}
+                                        {distinctConsumerNames.length}
                                     </span>
                                 </div>
                                 <div className="flex justify-between">
@@ -275,13 +224,15 @@ export default function TabsSection({
                                         Total Records:
                                     </span>
                                     <span className="font-semibold">
-                                        {tables
-                                            .reduce(
-                                                (sum, table) =>
-                                                    sum + table.rowCount,
-                                                0,
-                                            )
-                                            .toLocaleString()}
+                                        {rows?.length.toLocaleString()}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600">
+                                        Total Columns:
+                                    </span>
+                                    <span className="font-semibold">
+                                        {headers?.length}
                                     </span>
                                 </div>
                             </div>
@@ -291,24 +242,21 @@ export default function TabsSection({
                     <Card>
                         <CardBody className="p-6">
                             <h4 className="mb-4 text-lg font-semibold text-gray-800">
-                                Table Details
+                                Column Details
                             </h4>
                             <div className="space-y-2">
-                                {tables.map((table) => (
+                                {headers.map((header, index) => (
                                     <div
-                                        key={table.name}
+                                        key={header}
                                         className="rounded-lg border p-3"
                                     >
                                         <div className="flex items-center justify-between">
                                             <span className="font-medium">
-                                                {table.name}
+                                                {header}
                                             </span>
                                             <Chip size="sm" variant="flat">
-                                                {table.rowCount} rows
+                                                #{index + 1}
                                             </Chip>
-                                        </div>
-                                        <div className="mt-2 text-sm text-gray-600">
-                                            {table.columns.length} columns
                                         </div>
                                     </div>
                                 ))}

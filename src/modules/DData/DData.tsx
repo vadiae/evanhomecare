@@ -1,26 +1,56 @@
 "use client";
 
 import {
+    Accordion,
+    AccordionItem,
     Button,
     Card,
     CardBody,
     Checkbox,
-    Select,
-    SelectItem,
+    Chip,
 } from "@nextui-org/react";
 import { useState } from "react";
+import {
+    WaiverValidationErrors,
+    TotalServicesUnits,
+    ServicesGroupedByType,
+    AssociatedServices,
+    ServicesByDay,
+} from "./AnalysisComponents";
+
+interface DataRow {
+    consumerName?: string;
+    serviceCode?: string;
+    associatedService?: string;
+    documentationType?: string;
+    units?: string;
+    date?: string;
+    "Service Code"?: string;
+    "Associated Service"?: string;
+    "Documentation Type"?: string;
+    Units?: string;
+    Date?: string;
+    [key: string]: any;
+}
+
+interface DataStructure {
+    rows: DataRow[];
+    columns?: string[];
+    rowCount?: number;
+}
 
 interface AnalysisResult {
-    filteredData: any;
-    groupedByService: Record<string, any[]>;
+    filteredData: DataStructure;
+    groupedByService: Record<string, DataRow[]>;
     totalServiceGrouped: Record<string, number>;
     groupedByDay: Record<
         string,
         Record<
             string,
             {
-                entries: any[];
+                entries: DataRow[];
                 warning: boolean;
+                totalUnits: number;
             }
         >
     >;
@@ -31,24 +61,30 @@ interface AnalysisResult {
             errors: string[];
         }
     >;
-    groupedByAssociatedService: Record<string, any[]>;
+    groupedByAssociatedService: Record<string, DataRow[]>;
     waiverCount: number;
+}
+
+interface ConsumerAnalysisResult {
+    consumerName: string;
+    analysis: AnalysisResult;
+    hasErrors: boolean;
+    errorCount: number;
 }
 
 function DData({
     data,
     distinctConsumerNames,
 }: {
-    data: any;
+    data: DataStructure;
     distinctConsumerNames: string[];
 }) {
-    const [selectedConsumer, setSelectedConsumer] = useState<string>("");
     const [multipleEntrances, setMultipleEntrances] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
-    const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(
-        null,
-    );
-    console.log("🚀 ~ DData ~ analysisResult:", analysisResult);
+    const [analysisResults, setAnalysisResults] = useState<
+        ConsumerAnalysisResult[]
+    >([]);
+    const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
 
     const validServiceCodes = ["S5130:UC", "S5135:UC", "S5151:UC", "0000-WVR"];
 
@@ -63,15 +99,17 @@ function DData({
         "Quarterly Summary",
     ];
 
-    const validateWaiverEntry = (row: any) => {
+    const validateWaiverEntry = (row: DataRow) => {
         if (row["Service Code"] === "0000-WVR") {
             const associatedService = row["Associated Service"];
             const documentationType = row["Documentation Type"];
 
-            const isValidService =
-                validAssociatedServices.includes(associatedService);
-            const isValidDocType =
-                validDocumentationTypes.includes(documentationType);
+            const isValidService = validAssociatedServices.includes(
+                associatedService || "",
+            );
+            const isValidDocType = validDocumentationTypes.includes(
+                documentationType || "",
+            );
 
             return {
                 isValid: isValidService && isValidDocType,
@@ -80,99 +118,133 @@ function DData({
                         `Invalid Associated Service: ${associatedService}`,
                     !isValidDocType &&
                         `Invalid Documentation Type: ${documentationType}`,
-                ].filter(Boolean),
+                ].filter((error): error is string => Boolean(error)),
             };
         }
         return { isValid: true, errors: [] };
     };
 
-    const handleStartAnalysis = () => {
-        if (!selectedConsumer) {
-            setError("Please select a consumer first");
-            return;
-        }
-
+    const analyzeConsumer = (consumerName: string): ConsumerAnalysisResult => {
         const filteredRows = data.rows.filter(
-            (row: any) => row.consumerName === selectedConsumer,
+            (row: DataRow) => row.consumerName === consumerName,
         );
         const filteredData = { ...data, rows: filteredRows };
 
-        // Count total 0000-WVR entries
-        const waiverCount = filteredRows.filter(
-            (row: any) => row["Service Code"] === "0000-WVR",
-        ).length;
+        // Count total 0000-WVR entries per associated service
+        const waiverCountByService = filteredRows.reduce(
+            (acc: Record<string, number>, row: DataRow) => {
+                if (row["Service Code"] === "0000-WVR") {
+                    const associatedService =
+                        row["Associated Service"] || "Unknown";
+                    acc[associatedService] = (acc[associatedService] || 0) + 1;
+                }
+                return acc;
+            },
+            {},
+        );
+
+        // Get the maximum count among all associated services
+        const waiverCount = Math.max(...Object.values(waiverCountByService), 0);
 
         // Validate waiver entries
         const waiverValidation: Record<
             string,
             { isValid: boolean; errors: string[] }
         > = {};
-        filteredRows.forEach((row: any, index: number) => {
+        filteredRows.forEach((row: DataRow, index: number) => {
             const validation = validateWaiverEntry(row);
             if (!validation.isValid) {
-                waiverValidation[index] = validation;
+                waiverValidation[index.toString()] = validation;
             }
         });
 
         const groupedByService = filteredData.rows.reduce(
-            (acc: any, row: any) => {
+            (acc: Record<string, DataRow[]>, row: DataRow) => {
                 const serviceCode =
                     row["Service Code"] || "Not a 0000-WVR service";
                 if (!acc[serviceCode]) {
                     acc[serviceCode] = [];
                 }
-                acc[serviceCode].push(row);
+                acc[serviceCode]!.push(row);
                 return acc;
             },
             {},
         );
 
         const totalServiceGrouped = Object.entries(groupedByService).reduce(
-            (acc: any, [serviceCode, rows]: [string, any]) => {
-                acc[serviceCode] = rows.reduce((total: number, row: any) => {
-                    const units = parseFloat(row["Units"] || "0");
-                    return total + (isNaN(units) ? 0 : units);
-                }, 0);
+            (
+                acc: Record<string, number>,
+                [serviceCode, rows]: [string, DataRow[]],
+            ) => {
+                acc[serviceCode] = rows.reduce(
+                    (total: number, row: DataRow) => {
+                        const units = parseFloat(row.units || row.Units || "0");
+                        return total + (isNaN(units) ? 0 : units);
+                    },
+                    0,
+                );
                 return acc;
             },
             {},
         );
 
-        const groupedByDay = filteredData.rows.reduce((acc: any, row: any) => {
-            const serviceCode = row["Service Code"] || "Not a 0000-WVR service";
-            const date = row["Date"] || "Not a 0000-WVR service";
+        const groupedByDay = filteredData.rows.reduce(
+            (
+                acc: Record<
+                    string,
+                    Record<
+                        string,
+                        {
+                            entries: DataRow[];
+                            warning: boolean;
+                            totalUnits: number;
+                        }
+                    >
+                >,
+                row: DataRow,
+            ) => {
+                const serviceCode =
+                    row["Service Code"] || "Not a 0000-WVR service";
+                const date = row.date || row.Date || "Not a 0000-WVR service";
 
-            if (!acc[date]) {
-                acc[date] = {};
-            }
-            if (!acc[date][serviceCode]) {
-                acc[date][serviceCode] = {
-                    entries: [],
-                    warning: false,
-                };
-            }
+                if (!acc[date]) {
+                    acc[date] = {};
+                }
+                if (!acc[date]![serviceCode]) {
+                    acc[date]![serviceCode] = {
+                        entries: [],
+                        warning: false,
+                        totalUnits: 0,
+                    };
+                }
 
-            acc[date][serviceCode].entries.push(row);
-            if (acc[date][serviceCode].entries.length > 1) {
-                acc[date][serviceCode].warning = true;
-            }
+                acc[date]![serviceCode]!.entries.push(row);
+                if (acc[date]![serviceCode]!.entries.length > 1) {
+                    acc[date]![serviceCode]!.warning = true;
+                }
 
-            return acc;
-        }, {});
+                // Calculate total units for this service on this day
+                const units = parseFloat(row.units || row.Units || "0");
+                acc[date]![serviceCode]!.totalUnits += isNaN(units) ? 0 : units;
+
+                return acc;
+            },
+            {},
+        );
 
         // Group by Associated Service
         const groupedByAssociatedService = filteredData.rows.reduce(
-            (acc: any, row: any) => {
+            (acc: Record<string, DataRow[]>, row: DataRow) => {
                 if (row["Service Code"] === "0000-WVR") {
                     const associatedService =
                         row["Associated Service"] || "Unknown";
-                    const date = row["Date"];
+                    const date = row.date || row.Date;
                     const docType = row["Documentation Type"];
 
                     if (!acc[associatedService]) {
                         acc[associatedService] = [];
                     }
-                    acc[associatedService].push({
+                    acc[associatedService]!.push({
                         date,
                         docType,
                         ...row,
@@ -183,7 +255,7 @@ function DData({
             {},
         );
 
-        const result = {
+        const analysis = {
             filteredData,
             groupedByService,
             totalServiceGrouped,
@@ -193,20 +265,50 @@ function DData({
             waiverCount,
         };
 
-        setAnalysisResult(result);
-        console.log("🚀 ~ Analysis Results:", result);
+        const errorCount = Object.keys(waiverValidation).length;
+        const hasErrors = errorCount > 0;
+
+        return {
+            consumerName,
+            analysis,
+            hasErrors,
+            errorCount,
+        };
+    };
+
+    const handleStartAnalysis = async () => {
+        setIsAnalyzing(true);
+        setError("");
+
+        try {
+            const results: ConsumerAnalysisResult[] = [];
+
+            for (const consumerName of distinctConsumerNames) {
+                const result = analyzeConsumer(consumerName);
+                results.push(result);
+            }
+
+            setAnalysisResults(results);
+        } catch (err) {
+            setError("An error occurred during analysis");
+            console.error("Analysis error:", err);
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
+
+    const onCheckboxChange = () => {
+        setMultipleEntrances(!multipleEntrances);
+        setAnalysisResults([]);
+        setIsAnalyzing(false);
+        setError("");
     };
 
     return (
-        <Card>
+        <Card className="focus-within:outline-none">
             <CardBody className="p-6">
                 <h4 className="mb-4 text-lg font-semibold text-gray-800">
-                    Actions for{" "}
-                    {selectedConsumer && (
-                        <span className="text-md inline-flex items-center rounded-md bg-primary-100 px-2.5 py-0.5 text-primary-800">
-                            {selectedConsumer}
-                        </span>
-                    )}
+                    Analysis for All Consumers
                 </h4>
                 <div className="flex flex-col gap-4">
                     {error && (
@@ -215,25 +317,17 @@ function DData({
                         </div>
                     )}
                     <div className="flex items-center justify-between gap-4">
-                        <Select
-                            label="Select Consumer"
-                            placeholder="Choose a consumer"
-                            value={selectedConsumer}
-                            onChange={(e) => {
-                                setSelectedConsumer(e.target.value);
-                                if (e.target.value.trim() !== "") setError("");
-                            }}
-                            className="max-w-xs"
-                        >
-                            {distinctConsumerNames.map((name) => (
-                                <SelectItem key={name} value={name}>
-                                    {name}
-                                </SelectItem>
-                            ))}
-                        </Select>
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-600">
+                                Total Consumers: {distinctConsumerNames.length}
+                            </span>
+                            <Chip size="sm" color="primary" variant="flat">
+                                {distinctConsumerNames.length}
+                            </Chip>
+                        </div>
                         <Checkbox
                             isSelected={multipleEntrances}
-                            onValueChange={setMultipleEntrances}
+                            onValueChange={onCheckboxChange}
                         >
                             Multiple entrances of same service allowed
                         </Checkbox>
@@ -242,216 +336,119 @@ function DData({
                         color="primary"
                         className="mt-2 h-16 text-lg font-semibold"
                         onClick={handleStartAnalysis}
+                        isLoading={isAnalyzing}
+                        disabled={isAnalyzing}
                     >
-                        Start Analysis
+                        {isAnalyzing
+                            ? "Analyzing..."
+                            : "Start Analysis for All Consumers"}
                     </Button>
 
-                    {analysisResult !== null && (
+                    {analysisResults.length > 0 && (
                         <div className="mt-6">
                             <h5 className="mb-3 text-lg font-semibold">
-                                Analysis Results
+                                Analysis Results ({analysisResults.length}{" "}
+                                consumers)
                             </h5>
 
-                            {Object.keys(analysisResult.waiverValidation)
-                                .length > 0 && (
-                                <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
-                                    <h6 className="mb-2 font-medium text-red-700">
-                                        Waiver Entry Validation Errors
-                                    </h6>
-                                    {Object.entries(
-                                        analysisResult.waiverValidation,
-                                    ).map(([index, validation]) => (
-                                        <div
-                                            key={index}
-                                            className="mb-2 text-red-600"
-                                        >
-                                            {validation.errors.map(
-                                                (error, i) => (
-                                                    <p key={i}>{error}</p>
-                                                ),
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            <div className="rounded-lg border border-gray-200 p-4">
-                                <h6 className="mb-2 font-medium">
-                                    Total Services Units
-                                </h6>
-                                {Object.entries(
-                                    analysisResult.totalServiceGrouped,
-                                ).map(([service, total]) => (
-                                    <div
-                                        key={service}
-                                        className={`flex justify-between border-b border-gray-100 px-2 py-2 ${
-                                            !validServiceCodes.includes(service)
-                                                ? "bg-red-50"
-                                                : ""
-                                        }`}
-                                    >
-                                        <span
-                                            className={`${
-                                                !validServiceCodes.includes(
-                                                    service,
-                                                )
-                                                    ? "text-red-600"
-                                                    : "text-gray-600"
-                                            }`}
-                                        >
-                                            {service}
-                                        </span>
-                                        <span className="font-medium">
-                                            {total}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="mt-4 rounded-lg border border-gray-200 p-4">
-                                <h6 className="mb-2 font-medium">
-                                    Services Grouped by Type
-                                </h6>
-                                {Object.entries(
-                                    analysisResult.groupedByService,
-                                ).map(([service, items]) => (
-                                    <div
-                                        key={service}
-                                        className={`flex justify-between border-b border-gray-100 px-2 py-2 ${
-                                            !validServiceCodes.includes(service)
-                                                ? "bg-red-50"
-                                                : ""
-                                        }`}
-                                    >
-                                        <span
-                                            className={`${
-                                                !validServiceCodes.includes(
-                                                    service,
-                                                )
-                                                    ? "text-red-600"
-                                                    : "text-gray-600"
-                                            }`}
-                                        >
-                                            {service}
-                                        </span>
-                                        <span className="font-medium">
-                                            {items.length} entries
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="mt-4 rounded-lg border border-gray-200 p-4">
-                                <h6 className="mb-2 font-medium">
-                                    Associated Services
-                                </h6>
-                                {Object.entries(
-                                    analysisResult.groupedByAssociatedService,
-                                ).map(([service, items]) => (
-                                    <div key={service}>
-                                        <div
-                                            className={`flex justify-between border-b border-gray-100 px-2 py-2 ${
-                                                !validAssociatedServices.includes(
-                                                    service,
-                                                ) ||
-                                                items.length !==
-                                                    analysisResult.waiverCount
-                                                    ? "bg-red-50"
-                                                    : ""
-                                            }`}
-                                        >
-                                            <span
-                                                className={`${
-                                                    !validAssociatedServices.includes(
-                                                        service,
-                                                    ) ||
-                                                    items.length !==
-                                                        analysisResult.waiverCount
-                                                        ? "text-red-600"
-                                                        : "text-gray-600"
-                                                }`}
-                                            >
-                                                {service}
-                                            </span>
-                                            <span className="font-medium">
-                                                {items.length} entries{" "}
-                                                {items.length !==
-                                                    analysisResult.waiverCount &&
-                                                    `(Expected: ${analysisResult.waiverCount})`}
-                                            </span>
-                                        </div>
-                                        {items.map(
-                                            (item: any, index: number) => (
-                                                <div
-                                                    key={index}
-                                                    className="ml-4 border-b border-gray-100 px-2 py-1 text-sm"
-                                                >
-                                                    <div className="text-gray-600">
-                                                        Date: {item.date}
-                                                    </div>
-                                                    <div
-                                                        className={`${
-                                                            !item.docType
-                                                                ? "text-red-600"
-                                                                : "text-gray-600"
-                                                        }`}
-                                                    >
-                                                        Doc Type:{" "}
-                                                        {item.docType ||
-                                                            "No document type"}
+                            <Accordion variant="splitted">
+                                {analysisResults.map(
+                                    (consumerResult, index) => (
+                                        <AccordionItem
+                                            key={consumerResult.consumerName}
+                                            aria-label={`Analysis for ${consumerResult.consumerName}`}
+                                            classNames={{
+                                                base: "focus-within:outline-none",
+                                                title: "focus-within:outline-none",
+                                                trigger:
+                                                    "focus-within:outline-none",
+                                                titleWrapper:
+                                                    "focus-within:outline-none",
+                                            }}
+                                            title={
+                                                <div className="flex w-full items-center justify-between">
+                                                    <span className="font-medium">
+                                                        {
+                                                            consumerResult.consumerName
+                                                        }
+                                                    </span>
+                                                    <div className="flex items-center gap-2">
+                                                        {consumerResult.hasErrors && (
+                                                            <Chip
+                                                                size="sm"
+                                                                color="danger"
+                                                                variant="flat"
+                                                            >
+                                                                {
+                                                                    consumerResult.errorCount
+                                                                }{" "}
+                                                                errors
+                                                            </Chip>
+                                                        )}
+                                                        <Chip
+                                                            size="sm"
+                                                            color="primary"
+                                                            variant="flat"
+                                                        >
+                                                            {
+                                                                consumerResult
+                                                                    .analysis
+                                                                    .filteredData
+                                                                    .rows.length
+                                                            }{" "}
+                                                            Entries
+                                                        </Chip>
                                                     </div>
                                                 </div>
-                                            ),
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
+                                            }
+                                        >
+                                            <div className="space-y-4">
+                                                <WaiverValidationErrors
+                                                    consumerResult={
+                                                        consumerResult
+                                                    }
+                                                />
 
-                            <div className="mt-4 rounded-lg border border-gray-200 p-4">
-                                <h6 className="mb-2 font-medium">
-                                    Services by Day
-                                </h6>
-                                {Object.entries(analysisResult.groupedByDay)
-                                    .sort()
-                                    .map(([date, services]) => (
-                                        <div key={date} className="mb-4">
-                                            <h6 className="mb-2 bg-primary/10 px-3 py-2 text-lg font-semibold text-primary">
-                                                {date}
-                                            </h6>
-                                            {Object.entries(services).map(
-                                                ([service, data]) => (
-                                                    <div
-                                                        key={`${date}-${service}`}
-                                                        className={`flex justify-between border-b border-gray-100 px-2 py-2 ${
-                                                            !multipleEntrances &&
-                                                            data.warning
-                                                                ? "bg-red-50"
-                                                                : ""
-                                                        }`}
-                                                    >
-                                                        <span
-                                                            className={`${
-                                                                !multipleEntrances &&
-                                                                data.warning
-                                                                    ? "text-red-600"
-                                                                    : "text-gray-600"
-                                                            }`}
-                                                        >
-                                                            {service}
-                                                        </span>
-                                                        <span className="font-medium">
-                                                            {
-                                                                data.entries
-                                                                    .length
-                                                            }{" "}
-                                                            entries
-                                                        </span>
-                                                    </div>
-                                                ),
-                                            )}
-                                        </div>
-                                    ))}
-                            </div>
+                                                <TotalServicesUnits
+                                                    consumerResult={
+                                                        consumerResult
+                                                    }
+                                                    validServiceCodes={
+                                                        validServiceCodes
+                                                    }
+                                                />
+
+                                                <ServicesGroupedByType
+                                                    consumerResult={
+                                                        consumerResult
+                                                    }
+                                                    validServiceCodes={
+                                                        validServiceCodes
+                                                    }
+                                                />
+
+                                                <AssociatedServices
+                                                    consumerResult={
+                                                        consumerResult
+                                                    }
+                                                    validAssociatedServices={
+                                                        validAssociatedServices
+                                                    }
+                                                />
+
+                                                <ServicesByDay
+                                                    consumerResult={
+                                                        consumerResult
+                                                    }
+                                                    multipleEntrances={
+                                                        multipleEntrances
+                                                    }
+                                                />
+                                            </div>
+                                        </AccordionItem>
+                                    ),
+                                )}
+                            </Accordion>
                         </div>
                     )}
                 </div>
