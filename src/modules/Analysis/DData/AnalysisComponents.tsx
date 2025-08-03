@@ -123,7 +123,9 @@ export const TotalServicesUnits: React.FC<TotalServicesUnitsProps> = ({
         value: string,
     ) => {
         const newMatrix = [...matrix];
+
         if (newMatrix[dayIndex]?.[typeIndex] !== undefined) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             newMatrix[dayIndex][typeIndex] = parseInt(value) || 0;
             setMatrix(newMatrix);
         }
