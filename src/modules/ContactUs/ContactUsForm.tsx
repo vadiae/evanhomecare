@@ -1,7 +1,7 @@
 "use client";
 
-import { Textarea } from "@nextui-org/input";
-import { Button, Card, CardBody, Input } from "@nextui-org/react";
+import { Textarea } from "@heroui/input";
+import { Button, Card, CardBody, Input } from "@heroui/react";
 import { enqueueSnackbar } from "notistack";
 import React, { type SyntheticEvent } from "react";
 import Spinner from "~/components/Spinner/Spinner";

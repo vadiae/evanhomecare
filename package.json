@@ -15,7 +15,7 @@
     },
     "dependencies": {
         "@neondatabase/serverless": "^1.0.1",
-        "@nextui-org/react": "^2.2.9",
+        "@heroui/react": "2.8.2",
         "@pdftron/webviewer": "^10.8.0",
         "@t3-oss/env-nextjs": "^0.7.1",
         "@tanstack/react-query": "^4.36.1",

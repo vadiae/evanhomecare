@@ -9,8 +9,8 @@ import {
     ModalFooter,
     ModalHeader,
     useDisclosure,
-} from "@nextui-org/react";
-import { SearchIcon } from "@nextui-org/shared-icons";
+} from "@heroui/react";
+import { SearchIcon } from "@heroui/shared-icons";
 import Link from "next/link";
 import React from "react";
 import dictionary, {

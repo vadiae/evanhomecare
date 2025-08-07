@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
-import { Button, Input, Card } from "@nextui-org/react";
+import { Button, Input, Card } from "@heroui/react";
 import { enqueueSnackbar } from "notistack";
 import { z } from "zod";
 import { FaLock, FaLockOpen } from "react-icons/fa";

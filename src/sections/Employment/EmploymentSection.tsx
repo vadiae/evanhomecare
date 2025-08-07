@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Card, CardBody, Divider } from "@nextui-org/react";
+import { Button, Card, CardBody, Divider } from "@heroui/react";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";

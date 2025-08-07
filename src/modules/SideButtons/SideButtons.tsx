@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import Image from "next/image";
 import { FacebookIcon, LinkedinIcon } from "~/components/Icons/Icons";
 import { SearchInput } from "../Search/SearchInput";

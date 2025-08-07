@@ -12,7 +12,7 @@ import {
     TableColumn,
     TableHeader,
     TableRow,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useState } from "react";
 import { FiDownload, FiEye, FiSearch, FiTable, FiUsers } from "react-icons/fi";
 

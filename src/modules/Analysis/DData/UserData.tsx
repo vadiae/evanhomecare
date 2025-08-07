@@ -15,7 +15,7 @@ import {
     ModalBody,
     ModalFooter,
     useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { enqueueSnackbar } from "notistack";
 import {
     FiEdit3,

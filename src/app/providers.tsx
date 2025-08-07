@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { NextUIProvider } from "@nextui-org/react";
+import { HeroUIProvider } from "@heroui/react";
 import { SnackbarProvider } from "notistack";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -17,7 +17,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             }}
         >
             <QueryClientProvider client={queryClient}>
-                <NextUIProvider>{children}</NextUIProvider>
+                <HeroUIProvider>{children}</HeroUIProvider>
             </QueryClientProvider>
         </SnackbarProvider>
     );

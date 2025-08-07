@@ -8,7 +8,7 @@ import {
     CardBody,
     Checkbox,
     Chip,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useState } from "react";
 import {
     AssociatedServices,

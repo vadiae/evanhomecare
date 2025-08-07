@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Card, CardBody, Chip, Spinner } from "@nextui-org/react";
+import { Button, Card, CardBody, Chip, Spinner } from "@heroui/react";
 import React, { useRef, useState } from "react";
 import { FiDatabase, FiUpload } from "react-icons/fi";
 import { Title } from "~/components/Titles/Title";
