@@ -7,7 +7,7 @@ import React, { useState } from "react";
 import { FaLock, FaPlayCircle, FaArrowLeft } from "react-icons/fa";
 import { z } from "zod";
 import Spinner from "~/components/Spinner/Spinner";
-import AnalysisSection from "./AnalysisSection";
+import AnalysisSection from "../sections/AnalysisSection";
 import { IoAnalytics } from "react-icons/io5";
 
 const schema = z.object({

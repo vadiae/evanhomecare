@@ -14,7 +14,7 @@ import {
     TableRow,
 } from "@heroui/react";
 import { useState } from "react";
-import { FiDownload, FiEye, FiSearch, FiTable, FiUsers } from "react-icons/fi";
+import { FiDownload, FiSearch, FiTable, FiUsers } from "react-icons/fi";
 
 interface TabsSectionProps {
     distinctConsumerNames: string[];
@@ -201,69 +201,6 @@ export default function TabsSection({
                         </div>
                     </CardBody>
                 </Card>
-            )}
-
-            {activeTab === "general" && (
-                <div className="grid gap-6 lg:grid-cols-2">
-                    <Card>
-                        <CardBody className="p-6">
-                            <h4 className="mb-4 text-lg font-semibold text-gray-800">
-                                Data Overview
-                            </h4>
-                            <div className="space-y-3">
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">
-                                        Total Consumers:
-                                    </span>
-                                    <span className="font-semibold">
-                                        {distinctConsumerNames.length}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">
-                                        Total Records:
-                                    </span>
-                                    <span className="font-semibold">
-                                        {rows?.length.toLocaleString()}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">
-                                        Total Columns:
-                                    </span>
-                                    <span className="font-semibold">
-                                        {headers?.length}
-                                    </span>
-                                </div>
-                            </div>
-                        </CardBody>
-                    </Card>
-
-                    <Card>
-                        <CardBody className="p-6">
-                            <h4 className="mb-4 text-lg font-semibold text-gray-800">
-                                Column Details
-                            </h4>
-                            <div className="space-y-2">
-                                {headers.map((header, index) => (
-                                    <div
-                                        key={header}
-                                        className="rounded-lg border p-3"
-                                    >
-                                        <div className="flex items-center justify-between">
-                                            <span className="font-medium">
-                                                {header}
-                                            </span>
-                                            <Chip size="sm" variant="flat">
-                                                #{index + 1}
-                                            </Chip>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </CardBody>
-                    </Card>
-                </div>
             )}
         </div>
     );

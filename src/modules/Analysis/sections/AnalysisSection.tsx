@@ -4,10 +4,9 @@ import { Button, Card, CardBody, Chip, Spinner } from "@heroui/react";
 import React, { useRef, useState } from "react";
 import { FiDatabase, FiUpload } from "react-icons/fi";
 import { Title } from "~/components/Titles/Title";
-import DData from "~/modules/Analysis/DData/DData";
-import TabsSection from "~/modules/Analysis/DData/TabsSection";
-import { CustomNavbar } from "~/components/Navbar/Navbar";
-import UserData from "./UserData";
+import Analyzer from "~/modules/Analysis/analyzer/Analyzer";
+import TabsSection from "~/modules/Analysis/components/TabsSection";
+import UserData from "~/modules/Analysis/admin/UserData";
 
 interface JsonData {
     headers: string[];
@@ -181,7 +180,7 @@ export default function AnalysisSection({
                         )}
 
                         {rows?.length > 0 && (
-                            <DData
+                            <Analyzer
                                 data={{ rows, columns: headers }}
                                 distinctConsumerNames={distinctConsumerNames}
                             />

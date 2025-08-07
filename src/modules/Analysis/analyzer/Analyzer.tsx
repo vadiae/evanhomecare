@@ -10,28 +10,18 @@ import {
     Chip,
 } from "@heroui/react";
 import { useState } from "react";
+import { AssociatedServices } from "../components/results/AssociatedServices";
+import { ServicesByDay } from "../components/results/ServicesByDay";
+import { ServicesGroupedByType } from "../components/results/ServicesGroupedByType";
+import { TotalServicesUnits } from "../components/results/TotalServicesUnits";
+import { WaiverValidationErrors } from "../components/results/WaiverValidationErrors";
+import { ConsumerAnalysisResult, DataRow } from "./types";
 import {
-    AssociatedServices,
-    ServicesByDay,
-    ServicesGroupedByType,
-    TotalServicesUnits,
-    WaiverValidationErrors,
-} from "./AnalysisComponents";
-
-interface DataRow {
-    consumerName?: string;
-    serviceCode?: string;
-    associatedService?: string;
-    documentationType?: string;
-    units?: string;
-    date?: string;
-    "Service Code"?: string;
-    "Associated Service"?: string;
-    "Documentation Type"?: string;
-    Units?: string;
-    Date?: string;
-    [key: string]: any;
-}
+    validAssociatedServices,
+    validDocumentationTypes,
+    validServiceCodes,
+} from "./constants";
+import { validateWaiverEntry } from "./utils/validateWaiverEntry";
 
 interface DataStructure {
     rows: DataRow[];
@@ -39,40 +29,7 @@ interface DataStructure {
     rowCount?: number;
 }
 
-interface AnalysisResult {
-    filteredData: DataStructure;
-    groupedByService: Record<string, DataRow[]>;
-    totalServiceGrouped: Record<string, number>;
-    groupedByDay: Record<
-        string,
-        Record<
-            string,
-            {
-                entries: DataRow[];
-                warning: boolean;
-                totalUnits: number;
-            }
-        >
-    >;
-    waiverValidation: Record<
-        string,
-        {
-            isValid: boolean;
-            errors: string[];
-        }
-    >;
-    groupedByAssociatedService: Record<string, DataRow[]>;
-    waiverCount: number;
-}
-
-interface ConsumerAnalysisResult {
-    consumerName: string;
-    analysis: AnalysisResult;
-    hasErrors: boolean;
-    errorCount: number;
-}
-
-function DData({
+function Analyzer({
     data,
     distinctConsumerNames,
 }: {
@@ -85,44 +42,6 @@ function DData({
         ConsumerAnalysisResult[]
     >([]);
     const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
-
-    const validServiceCodes = ["S5130:UC", "S5135:UC", "S5151:UC", "0000-WVR"];
-
-    const validAssociatedServices = [
-        "Personal Supports",
-        "Life Skills Development 1",
-        "Respite",
-    ];
-    const validDocumentationTypes = [
-        "Annual Report",
-        "Monthly Summary",
-        "Quarterly Summary",
-    ];
-
-    const validateWaiverEntry = (row: DataRow) => {
-        if (row["Service Code"] === "0000-WVR") {
-            const associatedService = row["Associated Service"];
-            const documentationType = row["Documentation Type"];
-
-            const isValidService = validAssociatedServices.includes(
-                associatedService || "",
-            );
-            const isValidDocType = validDocumentationTypes.includes(
-                documentationType || "",
-            );
-
-            return {
-                isValid: isValidService && isValidDocType,
-                errors: [
-                    !isValidService &&
-                        `Invalid Associated Service: ${associatedService}`,
-                    !isValidDocType &&
-                        `Invalid Documentation Type: ${documentationType}`,
-                ].filter((error): error is string => Boolean(error)),
-            };
-        }
-        return { isValid: true, errors: [] };
-    };
 
     const analyzeConsumer = (consumerName: string): ConsumerAnalysisResult => {
         const filteredRows = data.rows.filter(
@@ -456,4 +375,4 @@ function DData({
     );
 }
 
-export default DData;
+export default Analyzer;
