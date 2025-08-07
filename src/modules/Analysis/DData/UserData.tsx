@@ -26,6 +26,7 @@ import {
     FiEye,
     FiEyeOff,
 } from "react-icons/fi";
+import TrainingLogs from "./TrainingLogs";
 
 interface User {
     id: number;
@@ -62,6 +63,7 @@ function UserData() {
         { id: "analyser", label: "Analysis Users" },
         { id: "jobApplications", label: "Job Applications" },
         { id: "training", label: "Training Users" },
+        { id: "trainingLogs", label: "Training Logs" },
     ];
 
     const fetchUsers = async (table: string) => {
@@ -91,7 +93,9 @@ function UserData() {
     };
 
     useEffect(() => {
-        void fetchUsers(activeTab);
+        if (activeTab !== "trainingLogs") {
+            void fetchUsers(activeTab);
+        }
     }, [activeTab]);
 
     const handleAddUser = async (e: React.FormEvent) => {
@@ -271,262 +275,279 @@ function UserData() {
                         ))}
                     </Tabs>
 
-                    {/* Form Card */}
-                    <Card className="mb-8 border-3 border-primary/10 bg-gradient-to-br from-transparent via-primary/5 to-transparent">
-                        <CardBody className="p-8">
-                            <div className="mb-5">
-                                <h3 className="text-2xl font-bold text-primary">
-                                    {editingUser
-                                        ? "Edit User"
-                                        : `Add New ${tabs
-                                              .find((t) => t.id === activeTab)
-                                              ?.label.replace(" Users", "")
-                                              .replace(
-                                                  " Applications",
-                                                  "",
-                                              )} User`}
-                                </h3>
-                            </div>
-
-                            <form
-                                onSubmit={
-                                    editingUser
-                                        ? handleUpdateUser
-                                        : handleAddUser
-                                }
-                                className="space-y-5"
-                            >
-                                <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-                                    <Input
-                                        type="text"
-                                        placeholder="Name"
-                                        value={formData.name}
-                                        onValueChange={(value) =>
-                                            setFormData({
-                                                ...formData,
-                                                name: value,
-                                            })
-                                        }
-                                        isRequired
-                                        variant="bordered"
-                                        classNames={{
-                                            inputWrapper: "border-primary/20",
-                                        }}
-                                    />
-                                    <Input
-                                        type="email"
-                                        placeholder="Email"
-                                        value={formData.email}
-                                        onValueChange={(value) =>
-                                            setFormData({
-                                                ...formData,
-                                                email: value,
-                                            })
-                                        }
-                                        isRequired
-                                        variant="bordered"
-                                        classNames={{
-                                            inputWrapper: "border-primary/20",
-                                        }}
-                                    />
-                                    <Input
-                                        type="password"
-                                        placeholder="Password"
-                                        value={formData.password}
-                                        onValueChange={(value) =>
-                                            setFormData({
-                                                ...formData,
-                                                password: value,
-                                            })
-                                        }
-                                        isRequired
-                                        variant="bordered"
-                                        classNames={{
-                                            inputWrapper: "border-primary/20",
-                                        }}
-                                    />
-                                </div>
-                                <div className="flex gap-4">
-                                    <Button
-                                        type="submit"
-                                        color="primary"
-                                        variant="shadow"
-                                        disabled={loading}
-                                        startContent={
-                                            loading ? (
-                                                <Spinner size="sm" />
-                                            ) : (
-                                                <FiPlus />
-                                            )
-                                        }
-                                    >
-                                        {loading
-                                            ? "Saving..."
-                                            : editingUser
-                                              ? "Update User"
-                                              : "Add User"}
-                                    </Button>
-                                    {editingUser && (
-                                        <Button
-                                            type="button"
-                                            variant="bordered"
-                                            color="danger"
-                                            onPress={cancelEdit}
-                                            startContent={<FiX />}
-                                        >
-                                            Cancel
-                                        </Button>
-                                    )}
-                                </div>
-                            </form>
-                        </CardBody>
-                    </Card>
-
-                    {/* Users Table */}
-                    <Card className="border-3 border-primary/10 bg-white">
-                        <CardBody className="p-0">
-                            {loading ? (
-                                <div className="flex items-center justify-center p-10">
-                                    <Spinner size="lg" />
-                                    <span className="ml-4 text-gray-500">
-                                        Loading users...
-                                    </span>
-                                </div>
-                            ) : (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full">
-                                        <thead>
-                                            <tr className="bg-gradient-to-r from-primary/5 to-primary/10">
-                                                <th className="px-8 py-5 text-left text-base font-semibold uppercase tracking-wider text-primary">
-                                                    Name
-                                                </th>
-                                                <th className="px-8 py-5 text-left text-base font-semibold uppercase tracking-wider text-primary">
-                                                    Email
-                                                </th>
-                                                <th className="px-8 py-5 text-left text-base font-semibold uppercase tracking-wider text-primary">
-                                                    Password
-                                                </th>
-                                                <th className="px-8 py-5 text-left text-base font-semibold uppercase tracking-wider text-primary">
-                                                    Created
-                                                </th>
-                                                <th className="px-8 py-5 text-left text-base font-semibold uppercase tracking-wider text-primary">
-                                                    Actions
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-primary/10">
-                                            {users.map((user) => (
-                                                <tr
-                                                    key={user.id}
-                                                    className="transition-colors hover:bg-primary/5"
-                                                >
-                                                    <td className="whitespace-nowrap px-8 py-5 text-base text-gray-900">
-                                                        {user.name}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-8 py-5 text-base text-gray-900">
-                                                        {user.email}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-8 py-5 text-base">
-                                                        <div className="flex items-center gap-3">
-                                                            <span className="font-mono">
-                                                                {visiblePasswords.has(
-                                                                    user.id,
-                                                                )
-                                                                    ? user.password
-                                                                    : "••••••••"}
-                                                            </span>
-                                                            <Button
-                                                                size="sm"
-                                                                variant="light"
-                                                                color="primary"
-                                                                onPress={() =>
-                                                                    togglePasswordVisibility(
-                                                                        user.id,
-                                                                    )
-                                                                }
-                                                                startContent={
-                                                                    visiblePasswords.has(
-                                                                        user.id,
-                                                                    ) ? (
-                                                                        <FiEyeOff
-                                                                            size={
-                                                                                21
-                                                                            }
-                                                                        />
-                                                                    ) : (
-                                                                        <FiEye
-                                                                            size={
-                                                                                21
-                                                                            }
-                                                                        />
-                                                                    )
-                                                                }
-                                                            >
-                                                                {visiblePasswords.has(
-                                                                    user.id,
-                                                                )
-                                                                    ? "Hide"
-                                                                    : "Show"}
-                                                            </Button>
-                                                        </div>
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-8 py-5 text-base text-gray-500">
-                                                        {new Date(
-                                                            user.createdAt,
-                                                        ).toLocaleDateString()}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-8 py-5 text-base">
-                                                        <div className="flex gap-3">
-                                                            <Button
-                                                                size="sm"
-                                                                variant="bordered"
-                                                                color="warning"
-                                                                onPress={() =>
-                                                                    startEdit(
-                                                                        user,
-                                                                    )
-                                                                }
-                                                                startContent={
-                                                                    <FiEdit3 />
-                                                                }
-                                                            >
-                                                                Edit
-                                                            </Button>
-                                                            <Button
-                                                                size="sm"
-                                                                variant="bordered"
-                                                                color="danger"
-                                                                onPress={() =>
-                                                                    openDeleteModal(
-                                                                        user,
-                                                                    )
-                                                                }
-                                                                startContent={
-                                                                    <FiTrash2 />
-                                                                }
-                                                            >
-                                                                Delete
-                                                            </Button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                            {users.length === 0 && !loading && (
-                                <div className="flex flex-col items-center justify-center p-10 text-center">
-                                    <div className="mb-3 text-5xl text-primary/30">
-                                        👥
+                    {/* Conditional Content Based on Active Tab */}
+                    {activeTab === "trainingLogs" ? (
+                        <TrainingLogs />
+                    ) : (
+                        <>
+                            {/* Form Card */}
+                            <Card className="mb-8 border-3 border-primary/10 bg-gradient-to-br from-transparent via-primary/5 to-transparent">
+                                <CardBody className="p-8">
+                                    <div className="mb-5">
+                                        <h3 className="text-2xl font-bold text-primary">
+                                            {editingUser
+                                                ? "Edit User"
+                                                : `Add New ${tabs
+                                                      .find(
+                                                          (t) =>
+                                                              t.id ===
+                                                              activeTab,
+                                                      )
+                                                      ?.label.replace(
+                                                          " Users",
+                                                          "",
+                                                      )
+                                                      .replace(
+                                                          " Applications",
+                                                          "",
+                                                      )} User`}
+                                        </h3>
                                     </div>
-                                    <p className="text-gray-500">
-                                        No users found in this table
-                                    </p>
-                                </div>
-                            )}
-                        </CardBody>
-                    </Card>
+
+                                    <form
+                                        onSubmit={
+                                            editingUser
+                                                ? handleUpdateUser
+                                                : handleAddUser
+                                        }
+                                        className="space-y-5"
+                                    >
+                                        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+                                            <Input
+                                                type="text"
+                                                placeholder="Name"
+                                                value={formData.name}
+                                                onValueChange={(value) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        name: value,
+                                                    })
+                                                }
+                                                isRequired
+                                                variant="bordered"
+                                                classNames={{
+                                                    inputWrapper:
+                                                        "border-primary/20",
+                                                }}
+                                            />
+                                            <Input
+                                                type="email"
+                                                placeholder="Email"
+                                                value={formData.email}
+                                                onValueChange={(value) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        email: value,
+                                                    })
+                                                }
+                                                isRequired
+                                                variant="bordered"
+                                                classNames={{
+                                                    inputWrapper:
+                                                        "border-primary/20",
+                                                }}
+                                            />
+                                            <Input
+                                                type="password"
+                                                placeholder="Password"
+                                                value={formData.password}
+                                                onValueChange={(value) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        password: value,
+                                                    })
+                                                }
+                                                isRequired
+                                                variant="bordered"
+                                                classNames={{
+                                                    inputWrapper:
+                                                        "border-primary/20",
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="flex gap-4">
+                                            <Button
+                                                type="submit"
+                                                color="primary"
+                                                variant="shadow"
+                                                disabled={loading}
+                                                startContent={
+                                                    loading ? (
+                                                        <Spinner size="sm" />
+                                                    ) : (
+                                                        <FiPlus />
+                                                    )
+                                                }
+                                            >
+                                                {loading
+                                                    ? "Saving..."
+                                                    : editingUser
+                                                      ? "Update User"
+                                                      : "Add User"}
+                                            </Button>
+                                            {editingUser && (
+                                                <Button
+                                                    type="button"
+                                                    variant="bordered"
+                                                    color="danger"
+                                                    onPress={cancelEdit}
+                                                    startContent={<FiX />}
+                                                >
+                                                    Cancel
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </form>
+                                </CardBody>
+                            </Card>
+
+                            {/* Users Table */}
+                            <Card className="border-3 border-primary/10 bg-white">
+                                <CardBody className="p-0">
+                                    {loading ? (
+                                        <div className="flex items-center justify-center p-10">
+                                            <Spinner size="lg" />
+                                            <span className="ml-4 text-gray-500">
+                                                Loading users...
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full">
+                                                <thead>
+                                                    <tr className="bg-gradient-to-r from-primary/5 to-primary/10">
+                                                        <th className="px-8 py-5 text-left text-base font-semibold uppercase tracking-wider text-primary">
+                                                            Name
+                                                        </th>
+                                                        <th className="px-8 py-5 text-left text-base font-semibold uppercase tracking-wider text-primary">
+                                                            Email
+                                                        </th>
+                                                        <th className="px-8 py-5 text-left text-base font-semibold uppercase tracking-wider text-primary">
+                                                            Password
+                                                        </th>
+                                                        <th className="px-8 py-5 text-left text-base font-semibold uppercase tracking-wider text-primary">
+                                                            Created
+                                                        </th>
+                                                        <th className="px-8 py-5 text-left text-base font-semibold uppercase tracking-wider text-primary">
+                                                            Actions
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-primary/10">
+                                                    {users.map((user) => (
+                                                        <tr
+                                                            key={user.id}
+                                                            className="transition-colors hover:bg-primary/5"
+                                                        >
+                                                            <td className="whitespace-nowrap px-8 py-5 text-base text-gray-900">
+                                                                {user.name}
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-8 py-5 text-base text-gray-900">
+                                                                {user.email}
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-8 py-5 text-base">
+                                                                <div className="flex items-center gap-3">
+                                                                    <span className="font-mono">
+                                                                        {visiblePasswords.has(
+                                                                            user.id,
+                                                                        )
+                                                                            ? user.password
+                                                                            : "••••••••"}
+                                                                    </span>
+                                                                    <Button
+                                                                        size="sm"
+                                                                        variant="light"
+                                                                        color="primary"
+                                                                        onPress={() =>
+                                                                            togglePasswordVisibility(
+                                                                                user.id,
+                                                                            )
+                                                                        }
+                                                                        startContent={
+                                                                            visiblePasswords.has(
+                                                                                user.id,
+                                                                            ) ? (
+                                                                                <FiEyeOff
+                                                                                    size={
+                                                                                        21
+                                                                                    }
+                                                                                />
+                                                                            ) : (
+                                                                                <FiEye
+                                                                                    size={
+                                                                                        21
+                                                                                    }
+                                                                                />
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        {visiblePasswords.has(
+                                                                            user.id,
+                                                                        )
+                                                                            ? "Hide"
+                                                                            : "Show"}
+                                                                    </Button>
+                                                                </div>
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-8 py-5 text-base text-gray-500">
+                                                                {new Date(
+                                                                    user.createdAt,
+                                                                ).toLocaleDateString()}
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-8 py-5 text-base">
+                                                                <div className="flex gap-3">
+                                                                    <Button
+                                                                        size="sm"
+                                                                        variant="bordered"
+                                                                        color="warning"
+                                                                        onPress={() =>
+                                                                            startEdit(
+                                                                                user,
+                                                                            )
+                                                                        }
+                                                                        startContent={
+                                                                            <FiEdit3 />
+                                                                        }
+                                                                    >
+                                                                        Edit
+                                                                    </Button>
+                                                                    <Button
+                                                                        size="sm"
+                                                                        variant="bordered"
+                                                                        color="danger"
+                                                                        onPress={() =>
+                                                                            openDeleteModal(
+                                                                                user,
+                                                                            )
+                                                                        }
+                                                                        startContent={
+                                                                            <FiTrash2 />
+                                                                        }
+                                                                    >
+                                                                        Delete
+                                                                    </Button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    )}
+                                    {users.length === 0 && !loading && (
+                                        <div className="flex flex-col items-center justify-center p-10 text-center">
+                                            <div className="mb-3 text-5xl text-primary/30">
+                                                👥
+                                            </div>
+                                            <p className="text-gray-500">
+                                                No users found in this table
+                                            </p>
+                                        </div>
+                                    )}
+                                </CardBody>
+                            </Card>
+                        </>
+                    )}
                 </CardBody>
             </Card>
 
