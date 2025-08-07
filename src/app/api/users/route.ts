@@ -140,7 +140,7 @@ export async function PUT(request: NextRequest) {
             const existingUser = await db
                 .select()
                 .from(AnalyserData)
-                .where(eq(AnalyserData.id, id))
+                .where(eq(AnalyserData.id, id as number))
                 .limit(1);
 
             if (existingUser[0]?.role === "admin") {
@@ -151,7 +151,13 @@ export async function PUT(request: NextRequest) {
             }
         }
 
-        const updateData: any = {};
+        interface UpdateData {
+            name?: string;
+            email?: string;
+            password?: string;
+        }
+
+        const updateData: UpdateData = {};
         if (name) updateData.name = name;
         if (email) updateData.email = email;
         if (password) updateData.password = password;
@@ -162,21 +168,21 @@ export async function PUT(request: NextRequest) {
                 result = await db
                     .update(AnalyserData)
                     .set(updateData)
-                    .where(eq(AnalyserData.id, id))
+                    .where(eq(AnalyserData.id, id as number))
                     .returning();
                 break;
             case "jobApplications":
                 result = await db
                     .update(JobApplications)
                     .set(updateData)
-                    .where(eq(JobApplications.id, id))
+                    .where(eq(JobApplications.id, id as number))
                     .returning();
                 break;
             case "training":
                 result = await db
                     .update(TrainingData)
                     .set(updateData)
-                    .where(eq(TrainingData.id, id))
+                    .where(eq(TrainingData.id, id as number))
                     .returning();
                 break;
             default:
@@ -221,7 +227,7 @@ export async function DELETE(request: NextRequest) {
             const existingUser = await db
                 .select()
                 .from(AnalyserData)
-                .where(eq(AnalyserData.id, id))
+                .where(eq(AnalyserData.id, id as number))
                 .limit(1);
 
             if (existingUser[0]?.role === "admin") {
@@ -237,19 +243,19 @@ export async function DELETE(request: NextRequest) {
             case "analyser":
                 result = await db
                     .delete(AnalyserData)
-                    .where(eq(AnalyserData.id, id))
+                    .where(eq(AnalyserData.id, id as number))
                     .returning();
                 break;
             case "jobApplications":
                 result = await db
                     .delete(JobApplications)
-                    .where(eq(JobApplications.id, id))
+                    .where(eq(JobApplications.id, id as number))
                     .returning();
                 break;
             case "training":
                 result = await db
                     .delete(TrainingData)
-                    .where(eq(TrainingData.id, id))
+                    .where(eq(TrainingData.id, id as number))
                     .returning();
                 break;
             default:

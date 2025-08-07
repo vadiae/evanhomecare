@@ -244,14 +244,14 @@ function UserData() {
 
     return (
         <>
-            <Card className="mx-auto my-6  border-2 border-primary/10 bg-gradient-to-br from-transparent via-primary/5 to-transparent">
-                <CardBody className="p-6">
+            <Card className="mx-auto my-8 border-3 border-primary/10 bg-gradient-to-br from-transparent via-primary/5 to-transparent">
+                <CardBody className="p-8">
                     {/* Header with gradient background */}
-                    <div className="relative mb-8 flex flex-col items-center justify-between gap-8 rounded-xl bg-gradient-to-br from-transparent via-primary/5 to-transparent p-8">
-                        <h2 className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-2xl font-bold uppercase text-transparent sm:text-4xl">
+                    <div className="relative mb-10 flex flex-col items-center justify-between gap-10 rounded-xl bg-gradient-to-br from-transparent via-primary/5 to-transparent p-10">
+                        <h2 className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-3xl font-bold uppercase text-transparent sm:text-5xl">
                             User Management
                         </h2>
-                        <div className="mt-2 h-1 w-20 rounded bg-gradient-to-r from-primary/30 to-primary/20 sm:w-32"></div>
+                        <div className="w-26 sm:w-42 mt-3 h-1.5 rounded bg-gradient-to-r from-primary/30 to-primary/20"></div>
                     </div>
 
                     {/* NextUI Tabs */}
@@ -262,7 +262,7 @@ function UserData() {
                             setEditingUser(null);
                             setFormData({ name: "", email: "", password: "" });
                         }}
-                        className="mb-6"
+                        className="mb-8"
                         color="primary"
                         variant="underlined"
                     >
@@ -272,10 +272,10 @@ function UserData() {
                     </Tabs>
 
                     {/* Form Card */}
-                    <Card className="mb-6 border-2 border-primary/10 bg-gradient-to-br from-transparent via-primary/5 to-transparent">
-                        <CardBody className="p-6">
-                            <div className="mb-4">
-                                <h3 className="text-xl font-bold text-primary">
+                    <Card className="mb-8 border-3 border-primary/10 bg-gradient-to-br from-transparent via-primary/5 to-transparent">
+                        <CardBody className="p-8">
+                            <div className="mb-5">
+                                <h3 className="text-2xl font-bold text-primary">
                                     {editingUser
                                         ? "Edit User"
                                         : `Add New ${tabs
@@ -294,9 +294,9 @@ function UserData() {
                                         ? handleUpdateUser
                                         : handleAddUser
                                 }
-                                className="space-y-4"
+                                className="space-y-5"
                             >
-                                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                                <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
                                     <Input
                                         type="text"
                                         placeholder="Name"
@@ -349,7 +349,7 @@ function UserData() {
                                         }}
                                     />
                                 </div>
-                                <div className="flex gap-3">
+                                <div className="flex gap-4">
                                     <Button
                                         type="submit"
                                         color="primary"
@@ -386,12 +386,12 @@ function UserData() {
                     </Card>
 
                     {/* Users Table */}
-                    <Card className="border-2 border-primary/10 bg-white">
+                    <Card className="border-3 border-primary/10 bg-white">
                         <CardBody className="p-0">
                             {loading ? (
-                                <div className="flex items-center justify-center p-8">
+                                <div className="flex items-center justify-center p-10">
                                     <Spinner size="lg" />
-                                    <span className="ml-3 text-gray-500">
+                                    <span className="ml-4 text-gray-500">
                                         Loading users...
                                     </span>
                                 </div>
@@ -400,19 +400,19 @@ function UserData() {
                                     <table className="w-full">
                                         <thead>
                                             <tr className="bg-gradient-to-r from-primary/5 to-primary/10">
-                                                <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-primary">
+                                                <th className="px-8 py-5 text-left text-base font-semibold uppercase tracking-wider text-primary">
                                                     Name
                                                 </th>
-                                                <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-primary">
+                                                <th className="px-8 py-5 text-left text-base font-semibold uppercase tracking-wider text-primary">
                                                     Email
                                                 </th>
-                                                <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-primary">
+                                                <th className="px-8 py-5 text-left text-base font-semibold uppercase tracking-wider text-primary">
                                                     Password
                                                 </th>
-                                                <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-primary">
+                                                <th className="px-8 py-5 text-left text-base font-semibold uppercase tracking-wider text-primary">
                                                     Created
                                                 </th>
-                                                <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-primary">
+                                                <th className="px-8 py-5 text-left text-base font-semibold uppercase tracking-wider text-primary">
                                                     Actions
                                                 </th>
                                             </tr>
@@ -423,14 +423,14 @@ function UserData() {
                                                     key={user.id}
                                                     className="transition-colors hover:bg-primary/5"
                                                 >
-                                                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
+                                                    <td className="whitespace-nowrap px-8 py-5 text-base text-gray-900">
                                                         {user.name}
                                                     </td>
-                                                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
+                                                    <td className="whitespace-nowrap px-8 py-5 text-base text-gray-900">
                                                         {user.email}
                                                     </td>
-                                                    <td className="whitespace-nowrap px-6 py-4 text-sm">
-                                                        <div className="flex items-center gap-2">
+                                                    <td className="whitespace-nowrap px-8 py-5 text-base">
+                                                        <div className="flex items-center gap-3">
                                                             <span className="font-mono">
                                                                 {visiblePasswords.has(
                                                                     user.id,
@@ -453,13 +453,13 @@ function UserData() {
                                                                     ) ? (
                                                                         <FiEyeOff
                                                                             size={
-                                                                                16
+                                                                                21
                                                                             }
                                                                         />
                                                                     ) : (
                                                                         <FiEye
                                                                             size={
-                                                                                16
+                                                                                21
                                                                             }
                                                                         />
                                                                     )
@@ -473,13 +473,13 @@ function UserData() {
                                                             </Button>
                                                         </div>
                                                     </td>
-                                                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                                                    <td className="whitespace-nowrap px-8 py-5 text-base text-gray-500">
                                                         {new Date(
                                                             user.createdAt,
                                                         ).toLocaleDateString()}
                                                     </td>
-                                                    <td className="whitespace-nowrap px-6 py-4 text-sm">
-                                                        <div className="flex gap-2">
+                                                    <td className="whitespace-nowrap px-8 py-5 text-base">
+                                                        <div className="flex gap-3">
                                                             <Button
                                                                 size="sm"
                                                                 variant="bordered"
@@ -519,8 +519,8 @@ function UserData() {
                                 </div>
                             )}
                             {users.length === 0 && !loading && (
-                                <div className="flex flex-col items-center justify-center p-8 text-center">
-                                    <div className="mb-2 text-4xl text-primary/30">
+                                <div className="flex flex-col items-center justify-center p-10 text-center">
+                                    <div className="mb-3 text-5xl text-primary/30">
                                         👥
                                     </div>
                                     <p className="text-gray-500">
@@ -539,7 +539,7 @@ function UserData() {
                     {(onClose) => (
                         <>
                             <ModalHeader className="flex flex-col gap-1">
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-3">
                                     <FiAlertTriangle className="text-danger" />
                                     <span className="font-semibold text-danger">
                                         Confirm Delete

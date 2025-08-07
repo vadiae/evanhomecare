@@ -80,12 +80,28 @@ export default function AnalysisSection({
             <div className="flex w-full flex-col items-center">
                 <div className="w-full max-w-[1440px] px-5 pb-20 sm:px-10">
                     <div className="mx-auto max-w-7xl sm:py-10">
+                        {user && (
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                    {user.name[0]?.toUpperCase()}
+                                </div>
+                                <div>
+                                    <p className="font-medium text-gray-800">
+                                        {user.name}
+                                    </p>
+                                    <p className="text-sm text-gray-500">
+                                        {user.email}
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {user && user.role === "admin" && <UserData />}
+
                         <Title
                             title="Data Analysis"
                             subtitle="Upload, analyze, and visualize your JSON data"
                         />
-
-                        {user && user.role === "admin" && <UserData />}
 
                         <div className="mb-8 grid gap-4 md:grid-cols-2">
                             <Card className="bg-gradient-to-br from-primary/5 to-transparent focus-within:outline-none">
