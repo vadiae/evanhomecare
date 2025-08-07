@@ -1,6 +1,6 @@
 "use client";
 
-import { CustomNavbar } from "~/modules/Navbar/Navbar";
+import { CustomNavbar } from "~/components/Navbar/Navbar";
 import { TrainingWithLock } from "~/modules/TrainingModule/TrainingWithLock";
 
 export default function Training() {

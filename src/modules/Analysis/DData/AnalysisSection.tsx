@@ -6,7 +6,7 @@ import { FiDatabase, FiUpload } from "react-icons/fi";
 import { Title } from "~/components/Titles/Title";
 import DData from "~/modules/Analysis/DData/DData";
 import TabsSection from "~/modules/Analysis/DData/TabsSection";
-import { CustomNavbar } from "~/modules/Navbar/Navbar";
+import { CustomNavbar } from "~/components/Navbar/Navbar";
 import UserData from "./UserData";
 
 interface JsonData {
@@ -75,8 +75,6 @@ export default function AnalysisSection({
 
     return (
         <main>
-            <CustomNavbar />
-
             <div className="flex w-full flex-col items-center">
                 <div className="w-full max-w-[1440px] px-5 pb-20 sm:px-10">
                     <div className="mx-auto max-w-7xl sm:py-10">

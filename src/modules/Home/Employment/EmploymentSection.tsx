@@ -7,7 +7,6 @@ import Link from "next/link";
 import React from "react";
 import { ExcelViewer } from "~/components/ExcelViewer/ExcelViewer";
 import { List } from "~/components/List/List";
-import Spinner from "~/components/Spinner/Spinner";
 import dictionary from "~/dictionary/dictionaryLink";
 import styles from "./Employment.module.css";
 

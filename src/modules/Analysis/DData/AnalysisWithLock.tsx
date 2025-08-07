@@ -8,6 +8,7 @@ import { FaLock, FaPlayCircle, FaArrowLeft } from "react-icons/fa";
 import { z } from "zod";
 import Spinner from "~/components/Spinner/Spinner";
 import AnalysisSection from "./AnalysisSection";
+import { IoAnalytics } from "react-icons/io5";
 
 const schema = z.object({
     password: z.string().min(1),
@@ -90,7 +91,7 @@ export function AnalysisWithLock() {
                 <Card className="w-full max-w-md space-y-8 rounded-xl bg-white p-8 shadow-2xl">
                     <div className="flex flex-col items-center space-y-2 text-center">
                         <div className="rounded-full bg-primary/5 p-3">
-                            <FaPlayCircle className="h-8 w-8 text-primary" />
+                            <IoAnalytics className="h-8 w-8 text-primary" />
                         </div>
                         <h1 className="text-2xl font-bold text-gray-900">
                             Data Analysis

@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { CustomNavbar } from "~/modules/Navbar/Navbar";
-import { EmploymentSection } from "~/sections/Employment/EmploymentSection";
+import { CustomNavbar } from "~/components/Navbar/Navbar";
+import { EmploymentSection } from "~/modules/Home/Employment/EmploymentSection";
 
 export default function Employment() {
     return (

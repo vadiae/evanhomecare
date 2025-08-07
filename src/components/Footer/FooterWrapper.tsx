@@ -1,8 +1,7 @@
 "use client";
 
-import React from "react";
 import dynamic from "next/dynamic";
-import { ContactUsForm } from "../ContactUs/ContactUsForm";
+import { ContactUsForm } from "~/modules/Home/ContactUs/ContactUsForm";
 
 const MapComponent = dynamic(
     () =>

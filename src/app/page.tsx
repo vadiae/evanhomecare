@@ -1,13 +1,13 @@
+import { Footer } from "~/components/Footer/Footer";
+import { CustomNavbar } from "~/components/Navbar/Navbar";
+import { SocialButtons } from "~/components/SideButtons/SideButtons";
 import { FloatingButton } from "~/modules/FloatingButton/FloatingButton";
-import { Footer } from "~/modules/Footer/Footer";
-import { CustomNavbar } from "~/modules/Navbar/Navbar";
-import { SocialButtons } from "~/modules/SideButtons/SideButtons";
-import { AboutUsSection } from "~/sections/AboutUs/AboutUsSection";
-import { ChooseUsSection } from "~/sections/ChooseUs/ChooseUsSection";
-import { HomeSection } from "~/sections/Home/HomeSection";
-import { ServicesSection } from "~/sections/Services/ServicesSection";
-import Squares from "~/sections/Squares/Squares";
-import TopSection from "~/sections/TopSection/TopSection";
+import { AboutUsSection } from "~/modules/Home/AboutUs/AboutUsSection";
+import { ChooseUsSection } from "~/modules/Home/ChooseUs/ChooseUsSection";
+import { HeroSection } from "~/modules/Home/Hero/Hero";
+import { ServicesSection } from "~/modules/Home/Services/ServicesSection";
+import Squares from "~/modules/Home/Squares/Squares";
+import TopSection from "~/modules/Home/TopSection/TopSection";
 
 export default async function Home() {
     return (
@@ -25,7 +25,7 @@ export default async function Home() {
 
                 <div className="flex w-full flex-col items-center">
                     <div className="w-full max-w-[1440px] px-3 pb-20 sm:px-10">
-                        <HomeSection />
+                        <HeroSection />
                         <ServicesSection />
                         <Squares />
                         <AboutUsSection />

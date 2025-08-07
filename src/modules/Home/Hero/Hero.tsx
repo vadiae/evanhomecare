@@ -1,10 +1,10 @@
 import Image from "next/image";
 import dictionary from "~/dictionary/dictionaryLink";
-import styles from "./home.module.css";
+import styles from "./hero.module.css";
 
-export function HomeSection() {
+export function HeroSection() {
     return (
-        <div id="Home">
+        <div id="Hero">
             <div className="relative -mx-[calc((100vw-100%)/2)] py-32 ">
                 <div className="absolute inset-0">
                     <svg

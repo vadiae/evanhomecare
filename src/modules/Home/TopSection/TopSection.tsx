@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { SocialButtons } from "~/modules/SideButtons/SideButtons";
+import { SocialButtons } from "~/components/SideButtons/SideButtons";
 
 function TopSection() {
     return (
