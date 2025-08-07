@@ -279,7 +279,11 @@ const trainings: Training[] = [
 
 const categories = ["All", ...new Set(trainings.map((t) => t.category))];
 
-export function TrainingModule() {
+export function TrainingModule({
+    user,
+}: {
+    user: { email: string; name: string } | null;
+}) {
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [selectedTraining, setSelectedTraining] = useState<Training | null>(
         null,
@@ -300,7 +304,7 @@ export function TrainingModule() {
             <div className="mx-auto max-w-[1920px]">
                 <div className="mb-10">
                     <div className="relative flex flex-col items-center justify-between gap-8 rounded-xl bg-gradient-to-br from-transparent via-primary/5 to-transparent p-8 sm:mt-4 sm:flex-row lg:mt-0">
-                        <div className="relative">
+                        <div className="relative hidden md:block">
                             <Image
                                 width={150}
                                 height={150}
@@ -311,21 +315,31 @@ export function TrainingModule() {
                         </div>
 
                         <div className="text-center sm:text-left">
-                            <h1 className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-2xl font-bold uppercase text-transparent sm:text-2xl sm:text-5xl">
+                            <h1 className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-center text-2xl font-bold uppercase text-transparent sm:text-2xl sm:text-5xl">
                                 Training
                             </h1>
-                            <div className="mt-2 h-1 w-20 rounded bg-gradient-to-r from-primary/30 to-primary/20 sm:w-32"></div>
+                            <div className="mx-auto mt-2 h-1 w-20 rounded bg-gradient-to-r from-primary/30 to-primary/20 sm:w-32"></div>
                             <p className="mt-4 text-xl text-gray-600">
                                 Master our platform with step-by-step video
                                 guides
                             </p>
                         </div>
 
-                        <div className="hidden sm:block">
-                            <div className="relative h-16 w-16 rounded-full border border-primary/10 bg-gradient-to-br from-primary/5 to-transparent">
-                                <FaVideo className="absolute left-1/2 top-1/2 h-8 w-8 -translate-x-1/2 -translate-y-1/2 text-primary/40" />
+                        {user && (
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                    {user.name[0]?.toUpperCase()}
+                                </div>
+                                <div>
+                                    <p className="font-medium text-gray-800">
+                                        {user.name}
+                                    </p>
+                                    <p className="text-sm text-gray-500">
+                                        {user.email}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </div>
 

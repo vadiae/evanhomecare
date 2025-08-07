@@ -22,6 +22,10 @@ export function TrainingWithLock() {
     });
     const [isLocked, setIsLocked] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
+    const [user, setUser] = useState<{
+        email: string;
+        name: string;
+    } | null>(null);
 
     const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setValues({ ...values, [e.target.name]: e.target.value });
@@ -44,6 +48,12 @@ export function TrainingWithLock() {
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                     if (response.data?.isValid) {
                         setIsLocked(false);
+                        setUser(
+                            response.data as {
+                                email: string;
+                                name: string;
+                            },
+                        );
                     } else {
                         enqueueSnackbar("Password incorrect", {
                             variant: "error",
@@ -134,5 +144,5 @@ export function TrainingWithLock() {
         );
     }
 
-    return <TrainingModule />;
+    return <TrainingModule user={user} />;
 }

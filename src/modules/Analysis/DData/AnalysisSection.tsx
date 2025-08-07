@@ -7,6 +7,7 @@ import { Title } from "~/components/Titles/Title";
 import DData from "~/modules/Analysis/DData/DData";
 import TabsSection from "~/modules/Analysis/DData/TabsSection";
 import { CustomNavbar } from "~/modules/Navbar/Navbar";
+import UserData from "./UserData";
 
 interface JsonData {
     headers: string[];
@@ -16,7 +17,11 @@ interface JsonData {
     recordsAmount?: number;
 }
 
-export default function AnalysisSection() {
+export default function AnalysisSection({
+    user,
+}: {
+    user: { email: string; name: string; role: string } | null;
+}) {
     const [isLoading, setIsLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [headers, setHeaders] = useState<string[]>([]);
@@ -71,6 +76,7 @@ export default function AnalysisSection() {
     return (
         <main>
             <CustomNavbar />
+
             <div className="flex w-full flex-col items-center">
                 <div className="w-full max-w-[1440px] px-5 pb-20 sm:px-10">
                     <div className="mx-auto max-w-7xl sm:py-10">
@@ -78,6 +84,8 @@ export default function AnalysisSection() {
                             title="Data Analysis"
                             subtitle="Upload, analyze, and visualize your JSON data"
                         />
+
+                        {user && user.role === "admin" && <UserData />}
 
                         <div className="mb-8 grid gap-4 md:grid-cols-2">
                             <Card className="bg-gradient-to-br from-primary/5 to-transparent focus-within:outline-none">

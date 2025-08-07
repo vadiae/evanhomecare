@@ -6,26 +6,30 @@
 
 import { Button, Input } from "@nextui-org/react";
 import WebViewer from "@pdftron/webviewer";
-import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import styles from "./apryse.module.css";
+import Image from "next/image";
+import { enqueueSnackbar } from "notistack";
+import React, { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import Spinner from "~/components/Spinner/Spinner";
-import { enqueueSnackbar } from "notistack";
-import Image from "next/image";
+import styles from "./apryse.module.css";
 
 const schema = z.object({
     name: z.string().min(1),
     email: z.string().min(1).email("Must be and email"),
 });
 
-export function ApryseModule() {
+export function ApryseModule({
+    user,
+}: {
+    user: { email: string; name: string } | null;
+}) {
     const [sending, setSending] = useState<boolean>(false);
 
     const [values, setValues] = React.useState({
-        name: "",
-        email: "",
+        name: user?.name || "",
+        email: user?.email || "",
     });
 
     const [errors, setErrors] = React.useState({
@@ -190,7 +194,7 @@ export function ApryseModule() {
         <div className="mx-auto max-w-[1200px] px-2 sm:py-10">
             <div className="mb-10">
                 <div className="relative mt-8 flex flex-col items-center justify-between gap-8 rounded-xl bg-gradient-to-br from-transparent via-primary/5 to-transparent p-8 sm:mt-4 sm:flex-row lg:mt-0">
-                    <div className="relative">
+                    <div className="relative hidden md:block">
                         <Image
                             width={150}
                             height={150}
@@ -207,23 +211,21 @@ export function ApryseModule() {
                         <div className="mt-2 h-1 w-20 rounded bg-gradient-to-r from-primary/30 to-primary/20 sm:w-32"></div>
                     </div>
 
-                    <div className="hidden sm:block">
-                        <div className="relative h-16 w-16 rounded-full border border-primary/10 bg-gradient-to-br from-primary/5 to-transparent">
-                            <svg
-                                className="absolute left-1/2 top-1/2 h-8 w-8 -translate-x-1/2 -translate-y-1/2 text-primary/40"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M5 13l4 4L19 7"
-                                />
-                            </svg>
+                    {user && (
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                {user.name[0]?.toUpperCase()}
+                            </div>
+                            <div>
+                                <p className="font-medium text-gray-800">
+                                    {user.name}
+                                </p>
+                                <p className="text-sm text-gray-500">
+                                    {user.email}
+                                </p>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
 
