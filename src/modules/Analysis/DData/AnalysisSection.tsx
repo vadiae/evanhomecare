@@ -104,7 +104,7 @@ export default function AnalysisSection({
                         />
 
                         <div className="mb-8 grid gap-4 md:grid-cols-2">
-                            <Card className="bg-gradient-to-br from-primary/5 to-transparent focus-within:outline-none">
+                            <Card className="bg-gradient-to-br from-primary/5 to-transparent">
                                 <CardBody className="p-8">
                                     <div className="flex flex-col items-center gap-6">
                                         <div className="flex items-center gap-3">
@@ -153,7 +153,7 @@ export default function AnalysisSection({
                                 </CardBody>
                             </Card>
 
-                            <Card className="focus-within:outline-none">
+                            <Card>
                                 <CardBody className="p-6">
                                     <h4 className="mb-4 text-lg font-semibold text-gray-800">
                                         How to Use:
@@ -195,7 +195,7 @@ export default function AnalysisSection({
                         />
 
                         {!rows && isLoading === false && (
-                            <Card className="mt-6 focus-within:outline-none">
+                            <Card className="mt-6">
                                 <CardBody className="p-6">
                                     <div className="text-center text-gray-500">
                                         <FiDatabase className="mx-auto mb-4 h-12 w-12 opacity-50" />
@@ -214,7 +214,7 @@ export default function AnalysisSection({
                         )}
 
                         {rows?.length === 0 && (
-                            <Card className="mt-6 focus-within:outline-none">
+                            <Card className="mt-6">
                                 <CardBody className="p-6">
                                     <div className="text-center text-gray-500">
                                         <FiDatabase className="mx-auto mb-4 h-12 w-12 opacity-50" />

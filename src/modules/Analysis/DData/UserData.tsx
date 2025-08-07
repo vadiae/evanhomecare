@@ -310,8 +310,7 @@ function UserData() {
                                         isRequired
                                         variant="bordered"
                                         classNames={{
-                                            inputWrapper:
-                                                "border-primary/20 focus-within:border-primary",
+                                            inputWrapper: "border-primary/20",
                                         }}
                                     />
                                     <Input
@@ -327,8 +326,7 @@ function UserData() {
                                         isRequired
                                         variant="bordered"
                                         classNames={{
-                                            inputWrapper:
-                                                "border-primary/20 focus-within:border-primary",
+                                            inputWrapper: "border-primary/20",
                                         }}
                                     />
                                     <Input
@@ -344,8 +342,7 @@ function UserData() {
                                         isRequired
                                         variant="bordered"
                                         classNames={{
-                                            inputWrapper:
-                                                "border-primary/20 focus-within:border-primary",
+                                            inputWrapper: "border-primary/20",
                                         }}
                                     />
                                 </div>

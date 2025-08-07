@@ -305,7 +305,7 @@ function DData({
     };
 
     return (
-        <Card className="focus-within:outline-none">
+        <Card>
             <CardBody className="p-6">
                 <h4 className="mb-4 text-lg font-semibold text-gray-800">
                     Analysis for All Consumers
@@ -358,12 +358,10 @@ function DData({
                                             key={consumerResult.consumerName}
                                             aria-label={`Analysis for ${consumerResult.consumerName}`}
                                             classNames={{
-                                                base: "focus-within:outline-none",
-                                                title: "focus-within:outline-none",
-                                                trigger:
-                                                    "focus-within:outline-none",
-                                                titleWrapper:
-                                                    "focus-within:outline-none",
+                                                base: "",
+                                                title: "",
+                                                trigger: "",
+                                                titleWrapper: "",
                                             }}
                                             title={
                                                 <div className="flex w-full items-center justify-between">
