@@ -4,7 +4,7 @@ import { Button, Card, Input } from "@heroui/react";
 import axios from "axios";
 import { enqueueSnackbar } from "notistack";
 import React, { useState } from "react";
-import { FaLock, FaPlayCircle } from "react-icons/fa";
+import { FaLock, FaPlayCircle, FaArrowLeft } from "react-icons/fa";
 import { z } from "zod";
 import Spinner from "~/components/Spinner/Spinner";
 import TrainingModule from "./TrainingModule";
@@ -133,6 +133,17 @@ export function TrainingWithLock() {
                             isDisabled={isLoading}
                         >
                             {isLoading ? <Spinner /> : "Access Training"}
+                        </Button>
+
+                        <Button
+                            variant="bordered"
+                            color="default"
+                            className="w-full"
+                            size="lg"
+                            startContent={<FaArrowLeft />}
+                            onPress={() => window.history.back()}
+                        >
+                            Go Back
                         </Button>
 
                         <p className="text-center text-xs text-gray-500">

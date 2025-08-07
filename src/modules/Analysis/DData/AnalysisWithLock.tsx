@@ -4,7 +4,7 @@ import { Button, Card, Input } from "@heroui/react";
 import axios from "axios";
 import { enqueueSnackbar } from "notistack";
 import React, { useState } from "react";
-import { FaLock, FaPlayCircle } from "react-icons/fa";
+import { FaLock, FaPlayCircle, FaArrowLeft } from "react-icons/fa";
 import { z } from "zod";
 import Spinner from "~/components/Spinner/Spinner";
 import AnalysisSection from "./AnalysisSection";
@@ -115,13 +115,10 @@ export function AnalysisWithLock() {
                                 }
                                 onChange={handleValueChange}
                                 onKeyDown={(e) =>
+                                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                                     e.key === "Enter" && void evaluatePassword()
                                 }
                                 isRequired
-                                classNames={{
-                                    label: "text-gray-600",
-                                    input: "bg-transparent",
-                                }}
                                 endContent={
                                     <FaLock className="text-gray-400" />
                                 }
@@ -135,6 +132,17 @@ export function AnalysisWithLock() {
                             isDisabled={isLoading}
                         >
                             {isLoading ? <Spinner /> : "Access Analysis"}
+                        </Button>
+
+                        <Button
+                            variant="bordered"
+                            color="default"
+                            className="w-full"
+                            size="lg"
+                            startContent={<FaArrowLeft />}
+                            onPress={() => window.history.back()}
+                        >
+                            Go Back
                         </Button>
 
                         <p className="text-center text-xs text-gray-500">

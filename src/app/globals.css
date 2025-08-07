@@ -48,9 +48,54 @@ html {
     height: 100vh;
 }
 
-:focus {
-    outline: 2px solid #2a809c;
-    outline-offset: 2px;
+/* Remove focus styles from Hero UI components */
+[data-slot] {
+    outline: none !important;
+}
+
+[data-slot]:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Specifically target Hero UI Input components */
+[data-slot="input"] {
+    outline: none !important;
+}
+
+[data-slot="input"]:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Remove focus rings from Hero UI Button components */
+[data-slot="button"] {
+    outline: none !important;
+}
+
+[data-slot="button"]:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Additional targeting for Hero UI components with specific class patterns */
+[class*="heroui"] {
+    outline: none !important;
+}
+
+[class*="heroui"]:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Target the input wrapper specifically */
+[data-slot="input-wrapper"] {
+    outline: none !important;
+}
+
+[data-slot="input-wrapper"]:focus {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 body {
