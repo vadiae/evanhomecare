@@ -7,7 +7,7 @@ import React, { useState } from "react";
 import { FaLock, FaPlayCircle, FaArrowLeft } from "react-icons/fa";
 import { z } from "zod";
 import Spinner from "~/components/Spinner/Spinner";
-import TrainingModule from "./TrainingModule";
+import TrainingPlayer from "../player/TrainingPlayer";
 
 const schema = z.object({
     password: z.string().min(1),
@@ -155,5 +155,5 @@ export function TrainingWithLock() {
         );
     }
 
-    return <TrainingModule user={user} />;
+    return <TrainingPlayer user={user} />;
 }

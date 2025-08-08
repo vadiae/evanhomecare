@@ -13,14 +13,14 @@ import React, { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import Spinner from "~/components/Spinner/Spinner";
-import styles from "./apryse.module.css";
+import styles from "../styles/jobApplication.module.css";
 
 const schema = z.object({
     name: z.string().min(1),
     email: z.string().min(1).email("Must be and email"),
 });
 
-export function ApryseModule({
+export function JobApplicationViewer({
     user,
 }: {
     user: { email: string; name: string } | null;
@@ -166,25 +166,13 @@ export function ApryseModule({
                 licenseKey: process.env.NEXT_PUBLIC_PDF_WEB_VIEWER,
                 initialDoc: filePath,
                 enableOfficeEditing: false,
-                disabledElements: [
-                    // "toolbarGroup-Select",
-                    // "toolbarGroup-Insert",
-                    // "toolbarGroup-Edit",
-                    // "toolbarGroup-View",
-                    // "toolbarGroup-Shapes",
-                    // "toolbarGroup-Forms",
-                    // "toolbarGroup-Annotate",
-                    // "toolbarGroup-FillAndSign",
-                    // "toolbarGroup-Comments",
-                ],
+                disabledElements: [],
             },
             viewer.current,
         )
             .then((instance) => {
                 const { docViewer } = instance;
                 instanceRef.current = instance;
-
-                // you can now call WebViewer APIs here...
             })
             .catch((error) => {
                 console.log(error);

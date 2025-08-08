@@ -1,4 +1,4 @@
-import { type Training } from "~/modules/TrainingModule/TrainingModule";
+import { type Training } from "~/modules/Training";
 
 export const trainings: Training[] = [
     {
@@ -27,6 +27,7 @@ export const trainings: Training[] = [
         url: "https://res.cloudinary.com/dvy2a4v0d/video/upload/v1738861667/evan_job_applications/training_videos/iiciorginkzkonf6f416.mp4",
         image_url:
             "https://res.cloudinary.com/dvy2a4v0d/video/upload/v1738861667/evan_job_applications/training_videos/iiciorginkzkonf6f416.jpg",
+
         category: "General",
         duration: "2:54",
     },

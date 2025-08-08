@@ -9,18 +9,19 @@ import { FaLock, FaLockOpen, FaArrowLeft } from "react-icons/fa";
 import axios from "axios";
 import Spinner from "~/components/Spinner/Spinner";
 
-const ApryseModule = dynamic(
-    () => import("./ApryseModule").then((mod) => mod.ApryseModule),
-    {
-        ssr: false,
-    },
+const JobApplicationViewer = dynamic(
+    () =>
+        import("../viewer/JobApplicationViewer").then(
+            (mod) => mod.JobApplicationViewer,
+        ),
+    { ssr: false },
 );
 
 const schema = z.object({
     password: z.string().min(1),
 });
 
-export function ApryseWithLock() {
+export function JobApplicationWithLock() {
     const [values, setValues] = React.useState({
         password: "",
     });
@@ -170,5 +171,5 @@ export function ApryseWithLock() {
         );
     }
 
-    return <ApryseModule user={user} />;
+    return <JobApplicationViewer user={user} />;
 }

@@ -4,20 +4,11 @@ import { useState } from "react";
 import { FaPlayCircle } from "react-icons/fa";
 import { TrainingLinks } from "~/components/TrainingLinks/TrainingLinks";
 import { trainings } from "~/data/trainingData";
-
-export interface Training {
-    id: string;
-    title: string;
-    description?: string;
-    url: string;
-    image_url: string;
-    category: string;
-    duration?: string;
-}
+import { type Training } from "../types";
 
 const categories = ["All", ...new Set(trainings.map((t) => t.category))];
 
-export function TrainingModule({
+export function TrainingPlayer({
     user,
 }: {
     user: { email: string; name: string } | null;
@@ -75,7 +66,7 @@ export function TrainingModule({
                         </div>
 
                         <div className="text-center sm:text-left">
-                            <h1 className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-center text-2xl font-bold uppercase text-transparent sm:text-2xl sm:text-5xl">
+                            <h1 className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-center text-2xl font-bold uppercase text-transparent sm:text-5xl">
                                 Training
                             </h1>
                             <div className="mx-auto mt-2 h-1 w-20 rounded bg-gradient-to-r from-primary/30 to-primary/20 sm:w-32"></div>
@@ -192,7 +183,7 @@ export function TrainingModule({
                                                     </span>
                                                     {training.duration && (
                                                         <span className="text-sm text-gray-500">
-                                                            •{" "}
+                                                            • {""}
                                                             {training.duration}
                                                         </span>
                                                     )}
@@ -283,4 +274,4 @@ export function TrainingModule({
     );
 }
 
-export default TrainingModule;
+export default TrainingPlayer;
