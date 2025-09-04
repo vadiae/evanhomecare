@@ -1,5 +1,5 @@
 import React from "react";
-import { ConsumerAnalysisResult } from "../../analyzer/types";
+import { type ConsumerAnalysisResult } from "../../analyzer/types";
 
 interface ServicesGroupedByTypeProps {
     consumerResult: ConsumerAnalysisResult;
@@ -13,7 +13,7 @@ export const ServicesGroupedByType: React.FC<ServicesGroupedByTypeProps> = ({
     return (
         <div className="rounded-lg border border-gray-200 p-4">
             <div className="mb-2 w-max rounded-md bg-primary px-2 text-lg font-semibold text-white">
-                <h6 className="">Services Grouped by Type</h6>
+                <h6 className="">Servicios Agrupados por Tipo</h6>
             </div>
             {Object.entries(consumerResult.analysis.groupedByService).map(
                 ([service, items]) => (
@@ -35,7 +35,8 @@ export const ServicesGroupedByType: React.FC<ServicesGroupedByTypeProps> = ({
                             {service}
                         </span>
                         <span className="font-medium">
-                            {items.length} entries
+                            {items.length}{" "}
+                            {items.length === 1 ? "entrada" : "entradas"}
                         </span>
                     </div>
                 ),

@@ -9,11 +9,17 @@ import TabsSection from "~/modules/Analysis/components/TabsSection";
 import UserData from "~/modules/Analysis/admin/UserData";
 
 interface JsonData {
+    extractionInfo: {
+        startDate: string;
+        endDate: string;
+    };
     headers: string[];
     rows: any[][];
     consumerNames?: string[];
     reportDate?: string;
     recordsAmount?: number;
+    startDate?: string;
+    endDate?: string;
 }
 
 export default function AnalysisSection({
@@ -29,6 +35,8 @@ export default function AnalysisSection({
     const [distinctConsumerNames, setDistinctConsumerNames] = useState<
         string[]
     >([]);
+    const [startDate, setStartDate] = useState<string>("");
+    const [endDate, setEndDate] = useState<string>("");
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -46,6 +54,9 @@ export default function AnalysisSection({
         setRows([]);
         setHeaders([]);
         setDistinctConsumerNames([]);
+        setStartDate("");
+        setEndDate("");
+
         try {
             const text = await file.text();
             const jsonData: JsonData = JSON.parse(text);
@@ -62,6 +73,8 @@ export default function AnalysisSection({
         try {
             setHeaders(jsonData.headers);
             setRows(jsonData.rows);
+            setStartDate(jsonData.extractionInfo.startDate || "");
+            setEndDate(jsonData.extractionInfo.endDate || "");
 
             if (jsonData.consumerNames) {
                 setDistinctConsumerNames(jsonData.consumerNames);
@@ -181,7 +194,12 @@ export default function AnalysisSection({
 
                         {rows?.length > 0 && (
                             <Analyzer
-                                data={{ rows, columns: headers }}
+                                data={{
+                                    rows,
+                                    columns: headers,
+                                    startDate,
+                                    endDate,
+                                }}
                                 distinctConsumerNames={distinctConsumerNames}
                             />
                         )}

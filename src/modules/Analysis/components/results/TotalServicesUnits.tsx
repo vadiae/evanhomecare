@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ConsumerAnalysisResult } from "../../analyzer/types";
+import { type ConsumerAnalysisResult } from "../../analyzer/types";
 
 interface TotalServicesUnitsProps {
     consumerResult: ConsumerAnalysisResult;
@@ -11,13 +11,13 @@ export const TotalServicesUnits: React.FC<TotalServicesUnitsProps> = ({
     validServiceCodes,
 }) => {
     const days = [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
+        "Lunes",
+        "Martes",
+        "Miércoles",
+        "Jueves",
+        "Viernes",
+        "Sábado",
+        "Domingo",
     ];
     const types = ["S5130:UC", "S5135:UC", "S5151:UC"];
 
@@ -72,7 +72,17 @@ export const TotalServicesUnits: React.FC<TotalServicesUnitsProps> = ({
                             weekday: "long",
                         },
                     );
-                    return entryDayOfWeek === day;
+                    // Map English day names to Spanish for comparison
+                    const dayMapping: { [key: string]: string } = {
+                        Monday: "Lunes",
+                        Tuesday: "Martes",
+                        Wednesday: "Miércoles",
+                        Thursday: "Jueves",
+                        Friday: "Viernes",
+                        Saturday: "Sábado",
+                        Sunday: "Domingo",
+                    };
+                    return dayMapping[entryDayOfWeek] === day;
                 },
             );
 
@@ -87,7 +97,7 @@ export const TotalServicesUnits: React.FC<TotalServicesUnitsProps> = ({
 
                 if (hasInputForDay) {
                     newErrors.noEntriesForDay.push(
-                        `${day}: No entries exist for this day of the week`,
+                        `${day}: No existen entradas para este día de la semana`,
                     );
                 }
             }
@@ -98,7 +108,18 @@ export const TotalServicesUnits: React.FC<TotalServicesUnitsProps> = ({
             const dayOfWeek = new Date(date).toLocaleDateString("en-US", {
                 weekday: "long",
             });
-            const dayIndex = days.indexOf(dayOfWeek);
+            // Map English day names to Spanish
+            const dayMapping: { [key: string]: string } = {
+                Monday: "Lunes",
+                Tuesday: "Martes",
+                Wednesday: "Miércoles",
+                Thursday: "Jueves",
+                Friday: "Viernes",
+                Saturday: "Sábado",
+                Sunday: "Domingo",
+            };
+            const spanishDayName = dayMapping[dayOfWeek];
+            const dayIndex = days.indexOf(spanishDayName);
 
             if (dayIndex !== -1) {
                 // Check for missing expected services
@@ -108,7 +129,7 @@ export const TotalServicesUnits: React.FC<TotalServicesUnitsProps> = ({
 
                     if (inputUnits > 0 && !serviceData) {
                         newErrors.missingServices.push(
-                            `(${date} - ${dayOfWeek}): Expected ${expectedService} with ${inputUnits} units but service was not found`,
+                            `(${date} - ${spanishDayName}): Se esperaba ${expectedService} con ${inputUnits} unidades pero no se encontró el servicio`,
                         );
                     }
                 });
@@ -129,11 +150,11 @@ export const TotalServicesUnits: React.FC<TotalServicesUnitsProps> = ({
 
                         if (inputUnits === 0 && actualUnits > 0) {
                             newErrors.unexpectedServices.push(
-                                `(${date} - ${dayOfWeek}): Unexpected service found: ${service} with ${actualUnits} units`,
+                                `(${date} - ${spanishDayName}): Servicio inesperado encontrado: ${service} con ${actualUnits} unidades`,
                             );
                         } else if (inputUnits !== actualUnits) {
                             newErrors.unitMismatches.push(
-                                `(${date} - ${dayOfWeek}): Service ${service} has ${actualUnits} units but expected ${inputUnits} units`,
+                                `(${date} - ${spanishDayName}): El servicio ${service} tiene ${actualUnits} unidades pero se esperaban ${inputUnits} unidades`,
                             );
                         }
                     }
@@ -160,7 +181,7 @@ export const TotalServicesUnits: React.FC<TotalServicesUnitsProps> = ({
     return (
         <div className="rounded-lg border border-gray-200 p-4">
             <div className="mb-2 w-max rounded-md bg-primary px-2 text-lg font-semibold text-white">
-                <h6 className="">Total Services Units</h6>
+                <h6 className="">Total de Unidades de Servicios</h6>
             </div>
 
             {Object.entries(consumerResult.analysis.totalServiceGrouped).map(
@@ -240,7 +261,7 @@ export const TotalServicesUnits: React.FC<TotalServicesUnitsProps> = ({
                         onClick={analyzeData}
                         className="rounded bg-primary px-4 py-2 text-white hover:bg-primary/90"
                     >
-                        Analyze Data
+                        Analizar Datos
                     </button>
 
                     {isAnalysisDone &&
@@ -249,7 +270,9 @@ export const TotalServicesUnits: React.FC<TotalServicesUnitsProps> = ({
                     errors.unitMismatches.length === 0 &&
                     errors.noEntriesForDay.length === 0 ? (
                         <div className="rounded-lg border border-green-200 bg-green-50 p-3">
-                            <p className="text-green-600">No errors found</p>
+                            <p className="text-green-600">
+                                No se encontraron errores
+                            </p>
                         </div>
                     ) : errors.missingServices.length > 0 ||
                       errors.unexpectedServices.length > 0 ||
@@ -257,13 +280,13 @@ export const TotalServicesUnits: React.FC<TotalServicesUnitsProps> = ({
                       errors.noEntriesForDay.length > 0 ? (
                         <div className="space-y-4">
                             <h6 className="font-medium text-red-700">
-                                Validation Errors
+                                Errores de Validación
                             </h6>
 
                             {errors.noEntriesForDay.length > 0 && (
                                 <div className="space-y-2">
                                     <h6 className="font-bold text-red-600">
-                                        Missing Days
+                                        Días Faltantes
                                     </h6>
                                     {errors.noEntriesForDay.map(
                                         (error, index) => (
@@ -283,7 +306,7 @@ export const TotalServicesUnits: React.FC<TotalServicesUnitsProps> = ({
                             {errors.missingServices.length > 0 && (
                                 <div className="space-y-2">
                                     <h6 className="font-bold text-red-600">
-                                        Missing Services
+                                        Servicios Faltantes
                                     </h6>
                                     {errors.missingServices.map(
                                         (error, index) => (
@@ -303,7 +326,7 @@ export const TotalServicesUnits: React.FC<TotalServicesUnitsProps> = ({
                             {errors.unexpectedServices.length > 0 && (
                                 <div className="space-y-2">
                                     <h6 className="font-bold text-red-600">
-                                        Unexpected Services
+                                        Servicios Inesperados
                                     </h6>
                                     {errors.unexpectedServices.map(
                                         (error, index) => (
@@ -323,7 +346,7 @@ export const TotalServicesUnits: React.FC<TotalServicesUnitsProps> = ({
                             {errors.unitMismatches.length > 0 && (
                                 <div className="space-y-2">
                                     <h6 className="font-bold text-red-600">
-                                        Unit Mismatches
+                                        Discrepancias de Unidades
                                     </h6>
                                     {errors.unitMismatches.map(
                                         (error, index) => (

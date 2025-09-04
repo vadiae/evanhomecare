@@ -15,7 +15,9 @@ export const WaiverValidationErrors: React.FC<WaiverValidationErrorsProps> = ({
     return (
         <div className="rounded-lg border border-red-200 bg-red-50 p-4">
             <div className="mb-2 w-max rounded-md bg-primary px-2 text-lg font-semibold text-white">
-                <h6 className="">Waiver Entry Validation Errors</h6>
+                <h6 className="">
+                    Errores de Validación de Entrada de Exención
+                </h6>
             </div>
 
             {Object.entries(consumerResult.analysis.waiverValidation).map(

@@ -14,7 +14,13 @@ export interface DataRow {
 }
 
 export interface AnalysisResult {
-    filteredData: any;
+    filteredData: {
+        rows: DataRow[];
+        columns?: string[];
+        rowCount?: number;
+        startDate?: string;
+        endDate?: string;
+    };
     groupedByService: Record<string, DataRow[]>;
     totalServiceGrouped: Record<string, number>;
     groupedByDay: Record<

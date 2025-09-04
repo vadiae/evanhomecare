@@ -1,5 +1,5 @@
 import React from "react";
-import { ConsumerAnalysisResult } from "../../analyzer/types";
+import { type ConsumerAnalysisResult } from "../../analyzer/types";
 
 interface ServicesByDayProps {
     consumerResult: ConsumerAnalysisResult;
@@ -13,7 +13,7 @@ export const ServicesByDay: React.FC<ServicesByDayProps> = ({
     return (
         <div className="rounded-lg border border-gray-200 p-4">
             <div className="mb-2 w-max rounded-md bg-primary px-2 text-lg font-semibold text-white">
-                <h6 className="">Services by Day</h6>
+                <h6 className="">Servicios por Día</h6>
             </div>
             {Object.entries(consumerResult.analysis.groupedByDay)
                 .sort()
@@ -22,7 +22,7 @@ export const ServicesByDay: React.FC<ServicesByDayProps> = ({
                         <h6 className="mb-2 flex items-center justify-between rounded-md bg-primary/10 px-3 py-2 text-lg font-semibold text-primary">
                             <span>{date}</span>
                             <span>
-                                {new Date(date).toLocaleDateString("en-US", {
+                                {new Date(date).toLocaleDateString("es-ES", {
                                     weekday: "short",
                                     day: "numeric",
                                     month: "long",
@@ -50,10 +50,13 @@ export const ServicesByDay: React.FC<ServicesByDayProps> = ({
                                 </span>
                                 <div className="flex flex-col items-end gap-1">
                                     <span className="font-medium">
-                                        {data.entries.length} entries
+                                        {data.entries.length}{" "}
+                                        {data.entries.length === 1
+                                            ? "entrada"
+                                            : "entradas"}
                                     </span>
                                     <span className="text-sm text-gray-500">
-                                        {data.totalUnits.toFixed(2)} units
+                                        {data.totalUnits.toFixed(2)} unidades
                                     </span>
                                 </div>
                             </div>

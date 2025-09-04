@@ -15,18 +15,16 @@ import { ServicesByDay } from "../components/results/ServicesByDay";
 import { ServicesGroupedByType } from "../components/results/ServicesGroupedByType";
 import { TotalServicesUnits } from "../components/results/TotalServicesUnits";
 import { WaiverValidationErrors } from "../components/results/WaiverValidationErrors";
-import { ConsumerAnalysisResult, DataRow } from "./types";
-import {
-    validAssociatedServices,
-    validDocumentationTypes,
-    validServiceCodes,
-} from "./constants";
+import { validAssociatedServices, validServiceCodes } from "./constants";
+import { type ConsumerAnalysisResult, type DataRow } from "./types";
 import { validateWaiverEntry } from "./utils/validateWaiverEntry";
 
 interface DataStructure {
     rows: DataRow[];
     columns?: string[];
     rowCount?: number;
+    startDate?: string;
+    endDate?: string;
 }
 
 function Analyzer({
@@ -107,48 +105,109 @@ function Analyzer({
             {},
         );
 
-        const groupedByDay = filteredData.rows.reduce(
-            (
-                acc: Record<
+        // Helper function to generate all dates in range
+        const generateDateRange = (
+            startDate: string,
+            endDate: string,
+        ): string[] => {
+            const dates: string[] = [];
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+
+            // Ensure we're working with valid dates
+            if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+                throw new Error("Invalid date format");
+            }
+
+            const current = new Date(start);
+            while (current <= end) {
+                // Format as MM/DD/YYYY to match your data format
+                const month = String(current.getMonth() + 1).padStart(2, "0");
+                const day = String(current.getDate()).padStart(2, "0");
+                const year = current.getFullYear();
+                dates.push(`${month}/${day}/${year}`);
+
+                current.setDate(current.getDate() + 1);
+            }
+
+            return dates;
+        };
+
+        // Initialize the structure with all dates
+        const initializeGroupedData = (startDate: string, endDate: string) => {
+            const allDates = generateDateRange(startDate, endDate);
+            const initialized: Record<
+                string,
+                Record<
                     string,
-                    Record<
-                        string,
-                        {
-                            entries: DataRow[];
-                            warning: boolean;
-                            totalUnits: number;
-                        }
-                    >
-                >,
-                row: DataRow,
-            ) => {
+                    {
+                        entries: DataRow[];
+                        warning: boolean;
+                        totalUnits: number;
+                    }
+                >
+            > = {};
+
+            // Initialize each date with empty object
+            allDates.forEach((date) => {
+                initialized[date] = {};
+            });
+
+            return initialized;
+        };
+
+        // Your updated groupedByDay function
+        const createGroupedByDay = (
+            filteredData: { rows: DataRow[] },
+            startDate: string,
+            endDate: string,
+        ) => {
+            if (!startDate || !endDate) {
+                return {};
+            }
+
+            // Initialize with all dates in range
+            const groupedByDay = initializeGroupedData(startDate, endDate);
+
+            // Populate with actual data
+            filteredData.rows.forEach((row: DataRow) => {
                 const serviceCode =
                     row["Service Code"] || "Not a 0000-WVR service";
                 const date = row.date || row.Date || "Not a 0000-WVR service";
 
-                if (!acc[date]) {
-                    acc[date] = {};
+                // Skip if date is not in our range (shouldn't happen with proper filtering)
+                if (!groupedByDay[date]) {
+                    return;
                 }
-                if (!acc[date]![serviceCode]) {
-                    acc[date]![serviceCode] = {
+
+                // Initialize service code if it doesn't exist for this date
+                if (!groupedByDay[date]![serviceCode]) {
+                    groupedByDay[date]![serviceCode] = {
                         entries: [],
                         warning: false,
                         totalUnits: 0,
                     };
                 }
 
-                acc[date]![serviceCode]!.entries.push(row);
-                if (acc[date]![serviceCode]!.entries.length > 1) {
-                    acc[date]![serviceCode]!.warning = true;
+                groupedByDay[date]![serviceCode]!.entries.push(row);
+                if (groupedByDay[date]![serviceCode]!.entries.length > 1) {
+                    groupedByDay[date]![serviceCode]!.warning = true;
                 }
 
                 // Calculate total units for this service on this day
                 const units = parseFloat(row.units || row.Units || "0");
-                acc[date]![serviceCode]!.totalUnits += isNaN(units) ? 0 : units;
+                groupedByDay[date]![serviceCode]!.totalUnits += isNaN(units)
+                    ? 0
+                    : units;
+            });
 
-                return acc;
-            },
-            {},
+            return groupedByDay;
+        };
+
+        const groupedByDay = createGroupedByDay(
+            filteredData,
+            data.startDate || "",
+            data.endDate || "",
         );
 
         // Group by Associated Service
@@ -209,7 +268,7 @@ function Analyzer({
 
             setAnalysisResults(results);
         } catch (err) {
-            setError("An error occurred during analysis");
+            setError("Ocurrió un error durante el análisis");
             console.error("Analysis error:", err);
         } finally {
             setIsAnalyzing(false);
@@ -227,7 +286,7 @@ function Analyzer({
         <Card>
             <CardBody className="p-6">
                 <h4 className="mb-4 text-lg font-semibold text-gray-800">
-                    Analysis for All Consumers
+                    Análisis para Todos los Consumidores
                 </h4>
                 <div className="flex flex-col gap-4">
                     {error && (
@@ -238,7 +297,8 @@ function Analyzer({
                     <div className="flex items-center justify-between gap-4">
                         <div className="flex items-center gap-2">
                             <span className="text-sm text-gray-600">
-                                Total Consumers: {distinctConsumerNames.length}
+                                Total de Consumidores:{" "}
+                                {distinctConsumerNames.length}
                             </span>
                             <Chip size="sm" color="primary" variant="flat">
                                 {distinctConsumerNames.length}
@@ -248,7 +308,7 @@ function Analyzer({
                             isSelected={multipleEntrances}
                             onValueChange={onCheckboxChange}
                         >
-                            Multiple entrances of same service allowed
+                            Permitir múltiples entradas del mismo servicio
                         </Checkbox>
                     </div>
                     <Button
@@ -259,15 +319,19 @@ function Analyzer({
                         disabled={isAnalyzing}
                     >
                         {isAnalyzing
-                            ? "Analyzing..."
-                            : "Start Analysis for All Consumers"}
+                            ? "Analizando..."
+                            : "Iniciar Análisis para Todos los Consumidores"}
                     </Button>
 
                     {analysisResults.length > 0 && (
                         <div className="mt-6">
                             <h5 className="mb-3 text-lg font-semibold">
-                                Analysis Results ({analysisResults.length}{" "}
-                                consumers)
+                                Resultados del Análisis (
+                                {analysisResults.length}{" "}
+                                {analysisResults.length === 1
+                                    ? "consumidor"
+                                    : "consumidores"}
+                                )
                             </h5>
 
                             <Accordion variant="splitted">
@@ -275,7 +339,7 @@ function Analyzer({
                                     (consumerResult, index) => (
                                         <AccordionItem
                                             key={consumerResult.consumerName}
-                                            aria-label={`Analysis for ${consumerResult.consumerName}`}
+                                            aria-label={`Análisis para ${consumerResult.consumerName}`}
                                             classNames={{
                                                 base: "",
                                                 title: "",
@@ -300,7 +364,10 @@ function Analyzer({
                                                                 {
                                                                     consumerResult.errorCount
                                                                 }{" "}
-                                                                errors
+                                                                {consumerResult.errorCount ===
+                                                                1
+                                                                    ? "error"
+                                                                    : "errores"}
                                                             </Chip>
                                                         )}
                                                         <Chip
@@ -314,7 +381,13 @@ function Analyzer({
                                                                     .filteredData
                                                                     .rows.length
                                                             }{" "}
-                                                            Entries
+                                                            {consumerResult
+                                                                .analysis
+                                                                .filteredData
+                                                                .rows.length ===
+                                                            1
+                                                                ? "Entrada"
+                                                                : "Entradas"}
                                                         </Chip>
                                                     </div>
                                                 </div>

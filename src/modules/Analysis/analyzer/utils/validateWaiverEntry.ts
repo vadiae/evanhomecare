@@ -1,5 +1,5 @@
-import { DataRow } from "../types";
 import { validAssociatedServices, validDocumentationTypes } from "../constants";
+import { type DataRow } from "../types";
 
 export function validateWaiverEntry(row: DataRow): {
     isValid: boolean;

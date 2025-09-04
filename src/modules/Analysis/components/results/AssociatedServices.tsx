@@ -13,7 +13,7 @@ export const AssociatedServices: React.FC<AssociatedServicesProps> = ({
     return (
         <div className="rounded-lg border border-gray-200 p-4">
             <div className="mb-2 w-max rounded-md bg-primary px-2 text-lg font-semibold text-white">
-                <h6 className="">Associated Services</h6>
+                <h6 className="">Servicios Asociados</h6>
             </div>
             {Object.entries(
                 consumerResult.analysis.groupedByAssociatedService,
@@ -39,7 +39,8 @@ export const AssociatedServices: React.FC<AssociatedServicesProps> = ({
                             {service}
                         </span>
                         <span className="font-medium">
-                            {items.length} entries{" "}
+                            {items.length}{" "}
+                            {items.length === 1 ? "entrada" : "entradas"}{" "}
                         </span>
                     </div>
                     {items.map((item: DataRow, index: number) => (
@@ -48,7 +49,7 @@ export const AssociatedServices: React.FC<AssociatedServicesProps> = ({
                             className="ml-4 border-b border-gray-100 px-2 py-1 text-sm"
                         >
                             <div className="text-gray-600">
-                                Date: {item.date}
+                                Fecha: {item.date}
                             </div>
                             <div
                                 className={`${
@@ -59,7 +60,8 @@ export const AssociatedServices: React.FC<AssociatedServicesProps> = ({
                                 }`}
                             >
                                 {/* @ts-ignore */}
-                                Doc Type: {item.docType || "No document type"}
+                                Tipo de Documento:{" "}
+                                {item.docType || "Sin tipo de documento"}
                             </div>
                         </div>
                     ))}
