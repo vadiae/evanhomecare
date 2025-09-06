@@ -1,5 +1,5 @@
 import React from "react";
-import { ConsumerAnalysisResult } from "../../analyzer/types";
+import { type ConsumerAnalysisResult } from "../../analyzer/types";
 
 interface WaiverValidationErrorsProps {
     consumerResult: ConsumerAnalysisResult;

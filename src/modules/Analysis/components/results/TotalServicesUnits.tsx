@@ -73,7 +73,7 @@ export const TotalServicesUnits: React.FC<TotalServicesUnitsProps> = ({
                         },
                     );
                     // Map English day names to Spanish for comparison
-                    const dayMapping: { [key: string]: string } = {
+                    const dayMapping: Record<string, string> = {
                         Monday: "Lunes",
                         Tuesday: "Martes",
                         Wednesday: "Miércoles",
@@ -109,7 +109,7 @@ export const TotalServicesUnits: React.FC<TotalServicesUnitsProps> = ({
                 weekday: "long",
             });
             // Map English day names to Spanish
-            const dayMapping: { [key: string]: string } = {
+            const dayMapping: Record<string, string> = {
                 Monday: "Lunes",
                 Tuesday: "Martes",
                 Wednesday: "Miércoles",
@@ -119,7 +119,7 @@ export const TotalServicesUnits: React.FC<TotalServicesUnitsProps> = ({
                 Sunday: "Domingo",
             };
             const spanishDayName = dayMapping[dayOfWeek];
-            const dayIndex = days.indexOf(spanishDayName);
+            const dayIndex = spanishDayName ? days.indexOf(spanishDayName) : -1;
 
             if (dayIndex !== -1) {
                 // Check for missing expected services
@@ -283,85 +283,95 @@ export const TotalServicesUnits: React.FC<TotalServicesUnitsProps> = ({
                                 Errores de Validación
                             </h6>
 
-                            {errors.noEntriesForDay.length > 0 && (
-                                <div className="space-y-2">
-                                    <h6 className="font-bold text-red-600">
-                                        Días Faltantes
-                                    </h6>
-                                    {errors.noEntriesForDay.map(
-                                        (error, index) => (
-                                            <div
-                                                key={index}
-                                                className="rounded-lg border border-red-200 bg-red-50 p-3"
-                                            >
-                                                <p className="text-red-600">
-                                                    {error}
-                                                </p>
-                                            </div>
-                                        ),
-                                    )}
-                                </div>
-                            )}
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+                                {errors.noEntriesForDay.length > 0 && (
+                                    <div className="space-y-2">
+                                        <h6 className="font-bold text-red-600">
+                                            Días Faltantes
+                                        </h6>
+                                        <div className="space-y-2">
+                                            {errors.noEntriesForDay.map(
+                                                (error, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="rounded-lg border border-red-200 bg-red-50 p-3"
+                                                    >
+                                                        <p className="text-sm text-red-600">
+                                                            {error}
+                                                        </p>
+                                                    </div>
+                                                ),
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
 
-                            {errors.missingServices.length > 0 && (
-                                <div className="space-y-2">
-                                    <h6 className="font-bold text-red-600">
-                                        Servicios Faltantes
-                                    </h6>
-                                    {errors.missingServices.map(
-                                        (error, index) => (
-                                            <div
-                                                key={index}
-                                                className="rounded-lg border border-red-200 bg-red-50 p-3"
-                                            >
-                                                <p className="text-red-600">
-                                                    {error}
-                                                </p>
-                                            </div>
-                                        ),
-                                    )}
-                                </div>
-                            )}
+                                {errors.missingServices.length > 0 && (
+                                    <div className="space-y-2">
+                                        <h6 className="font-bold text-red-600">
+                                            Servicios Faltantes
+                                        </h6>
+                                        <div className="space-y-2">
+                                            {errors.missingServices.map(
+                                                (error, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="rounded-lg border border-red-200 bg-red-50 p-3"
+                                                    >
+                                                        <p className="text-sm text-red-600">
+                                                            {error}
+                                                        </p>
+                                                    </div>
+                                                ),
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
 
-                            {errors.unexpectedServices.length > 0 && (
-                                <div className="space-y-2">
-                                    <h6 className="font-bold text-red-600">
-                                        Servicios Inesperados
-                                    </h6>
-                                    {errors.unexpectedServices.map(
-                                        (error, index) => (
-                                            <div
-                                                key={index}
-                                                className="rounded-lg border border-red-200 bg-red-50 p-3"
-                                            >
-                                                <p className="text-red-600">
-                                                    {error}
-                                                </p>
-                                            </div>
-                                        ),
-                                    )}
-                                </div>
-                            )}
+                                {errors.unexpectedServices.length > 0 && (
+                                    <div className="space-y-2">
+                                        <h6 className="font-bold text-red-600">
+                                            Servicios Inesperados
+                                        </h6>
+                                        <div className="space-y-2">
+                                            {errors.unexpectedServices.map(
+                                                (error, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="rounded-lg border border-red-200 bg-red-50 p-3"
+                                                    >
+                                                        <p className="text-sm text-red-600">
+                                                            {error}
+                                                        </p>
+                                                    </div>
+                                                ),
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
 
-                            {errors.unitMismatches.length > 0 && (
-                                <div className="space-y-2">
-                                    <h6 className="font-bold text-red-600">
-                                        Discrepancias de Unidades
-                                    </h6>
-                                    {errors.unitMismatches.map(
-                                        (error, index) => (
-                                            <div
-                                                key={index}
-                                                className="rounded-lg border border-red-200 bg-red-50 p-3"
-                                            >
-                                                <p className="text-red-600">
-                                                    {error}
-                                                </p>
-                                            </div>
-                                        ),
-                                    )}
-                                </div>
-                            )}
+                                {errors.unitMismatches.length > 0 && (
+                                    <div className="space-y-2">
+                                        <h6 className="font-bold text-red-600">
+                                            Discrepancias de Unidades
+                                        </h6>
+                                        <div className="space-y-2">
+                                            {errors.unitMismatches.map(
+                                                (error, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="rounded-lg border border-red-200 bg-red-50 p-3"
+                                                    >
+                                                        <p className="text-sm text-red-600">
+                                                            {error}
+                                                        </p>
+                                                    </div>
+                                                ),
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ) : null}
                 </div>

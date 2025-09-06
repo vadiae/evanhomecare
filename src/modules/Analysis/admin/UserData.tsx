@@ -27,6 +27,7 @@ import {
     FiEyeOff,
 } from "react-icons/fi";
 import TrainingLogs from "./TrainingLogs";
+import { Title } from "~/components/Titles/Title";
 
 interface User {
     id: number;
@@ -248,16 +249,9 @@ function UserData() {
 
     return (
         <>
-            <Card className="mx-auto my-8 border-3 border-primary/10 bg-gradient-to-br from-transparent via-primary/5 to-transparent">
-                <CardBody className="p-8">
-                    {/* Header with gradient background */}
-                    <div className="relative mb-10 flex flex-col items-center justify-between gap-10 rounded-xl bg-gradient-to-br from-transparent via-primary/5 to-transparent p-10">
-                        <h2 className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-3xl font-bold uppercase text-transparent sm:text-5xl">
-                            User Management
-                        </h2>
-                        <div className="w-26 sm:w-42 mt-3 h-1.5 rounded bg-gradient-to-r from-primary/30 to-primary/20"></div>
-                    </div>
-
+            <div>
+                <div className="">
+                    <Title title="User Management" />
                     {/* NextUI Tabs */}
                     <Tabs
                         selectedKey={activeTab}
@@ -548,8 +542,8 @@ function UserData() {
                             </Card>
                         </>
                     )}
-                </CardBody>
-            </Card>
+                </div>
+            </div>
 
             {/* Delete Confirmation Modal */}
             <Modal isOpen={isOpen} onClose={onClose} size="sm">

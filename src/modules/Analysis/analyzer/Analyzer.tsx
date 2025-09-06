@@ -13,11 +13,33 @@ import { useState } from "react";
 import { AssociatedServices } from "../components/results/AssociatedServices";
 import { ServicesByDay } from "../components/results/ServicesByDay";
 import { ServicesGroupedByType } from "../components/results/ServicesGroupedByType";
-import { TotalServicesUnits } from "../components/results/TotalServicesUnits";
 import { WaiverValidationErrors } from "../components/results/WaiverValidationErrors";
 import { validAssociatedServices, validServiceCodes } from "./constants";
 import { type ConsumerAnalysisResult, type DataRow } from "./types";
 import { validateWaiverEntry } from "./utils/validateWaiverEntry";
+
+interface ClientSchedule {
+    id: number;
+    clientId: string;
+    clientName: string;
+    startDate: string;
+    service: string;
+    monday: number | null;
+    tuesday: number | null;
+    wednesday: number | null;
+    thursday: number | null;
+    friday: number | null;
+    saturday: number | null;
+    sunday: number | null;
+    multiple: boolean | null;
+    createdAt: string;
+}
+
+interface ScheduleApiResponse {
+    schedules: ClientSchedule[];
+    success: boolean;
+    error?: string;
+}
 
 interface DataStructure {
     rows: DataRow[];
@@ -41,7 +63,10 @@ function Analyzer({
     >([]);
     const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
 
-    const analyzeConsumer = (consumerName: string): ConsumerAnalysisResult => {
+    const analyzeConsumer = (
+        consumerName: string,
+        schedules: ClientSchedule[],
+    ): ConsumerAnalysisResult => {
         const filteredRows = data.rows.filter(
             (row: DataRow) => row.consumerName === consumerName,
         );
@@ -259,10 +284,27 @@ function Analyzer({
         setError("");
 
         try {
+            const response = await fetch("/api/client-schedule");
+            const scheduleData: ScheduleApiResponse = await response.json();
+
+            if (!scheduleData.success) {
+                console.error(
+                    "Failed to load client schedules:",
+                    scheduleData.error,
+                );
+                setError("Failed to load client schedules");
+                return;
+            }
+
+            console.log("Loaded client schedules:", scheduleData.schedules);
+
             const results: ConsumerAnalysisResult[] = [];
 
             for (const consumerName of distinctConsumerNames) {
-                const result = analyzeConsumer(consumerName);
+                const result = analyzeConsumer(
+                    consumerName,
+                    scheduleData.schedules,
+                );
                 results.push(result);
             }
 
@@ -283,168 +325,150 @@ function Analyzer({
     };
 
     return (
-        <Card>
-            <CardBody className="p-6">
-                <h4 className="mb-4 text-lg font-semibold text-gray-800">
-                    Análisis para Todos los Consumidores
-                </h4>
-                <div className="flex flex-col gap-4">
-                    {error && (
-                        <div className="rounded-lg border border-red-200 bg-red-50 p-3">
-                            <p className="text-sm text-red-600">{error}</p>
-                        </div>
-                    )}
-                    <div className="flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-600">
-                                Total de Consumidores:{" "}
-                                {distinctConsumerNames.length}
+        <div className="space-y-3">
+            {error && (
+                <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2">
+                    <p className="text-xs text-red-600">{error}</p>
+                </div>
+            )}
+
+            <Card>
+                <CardBody className="p-6">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-center gap-2 self-start">
+                            <span className="text-xl font-semibold text-gray-800">
+                                Consumidores
                             </span>
                             <Chip size="sm" color="primary" variant="flat">
                                 {distinctConsumerNames.length}
                             </Chip>
                         </div>
-                        <Checkbox
-                            isSelected={multipleEntrances}
-                            onValueChange={onCheckboxChange}
-                        >
-                            Permitir múltiples entradas del mismo servicio
-                        </Checkbox>
-                    </div>
-                    <Button
-                        color="primary"
-                        className="mt-2 h-16 text-lg font-semibold"
-                        onClick={handleStartAnalysis}
-                        isLoading={isAnalyzing}
-                        disabled={isAnalyzing}
-                    >
-                        {isAnalyzing
-                            ? "Analizando..."
-                            : "Iniciar Análisis para Todos los Consumidores"}
-                    </Button>
 
-                    {analysisResults.length > 0 && (
-                        <div className="mt-6">
-                            <h5 className="mb-3 text-lg font-semibold">
-                                Resultados del Análisis (
-                                {analysisResults.length}{" "}
-                                {analysisResults.length === 1
-                                    ? "consumidor"
-                                    : "consumidores"}
-                                )
-                            </h5>
+                        <div className="flex flex-col  gap-3">
+                            <Checkbox
+                                size="sm"
+                                isSelected={multipleEntrances}
+                                onValueChange={onCheckboxChange}
+                                className="text-sm text-gray-700"
+                            >
+                                Permitir múltiples entradas
+                            </Checkbox>
 
-                            <Accordion variant="splitted">
-                                {analysisResults.map(
-                                    (consumerResult, index) => (
-                                        <AccordionItem
-                                            key={consumerResult.consumerName}
-                                            aria-label={`Análisis para ${consumerResult.consumerName}`}
-                                            classNames={{
-                                                base: "",
-                                                title: "",
-                                                trigger: "",
-                                                titleWrapper: "",
-                                            }}
-                                            title={
-                                                <div className="flex w-full items-center justify-between">
-                                                    <span className="font-medium">
-                                                        {index + 1}.{" "}
-                                                        {
-                                                            consumerResult.consumerName
-                                                        }
-                                                    </span>
-                                                    <div className="flex items-center gap-2">
-                                                        {consumerResult.hasErrors && (
-                                                            <Chip
-                                                                size="sm"
-                                                                color="danger"
-                                                                variant="flat"
-                                                            >
-                                                                {
-                                                                    consumerResult.errorCount
-                                                                }{" "}
-                                                                {consumerResult.errorCount ===
-                                                                1
-                                                                    ? "error"
-                                                                    : "errores"}
-                                                            </Chip>
-                                                        )}
-                                                        <Chip
-                                                            size="sm"
-                                                            color="primary"
-                                                            variant="flat"
-                                                        >
-                                                            {
-                                                                consumerResult
-                                                                    .analysis
-                                                                    .filteredData
-                                                                    .rows.length
-                                                            }{" "}
-                                                            {consumerResult
-                                                                .analysis
-                                                                .filteredData
-                                                                .rows.length ===
-                                                            1
-                                                                ? "Entrada"
-                                                                : "Entradas"}
-                                                        </Chip>
-                                                    </div>
-                                                </div>
-                                            }
-                                        >
-                                            <div className="space-y-4">
-                                                <WaiverValidationErrors
-                                                    consumerResult={
-                                                        consumerResult
-                                                    }
-                                                />
-
-                                                <TotalServicesUnits
-                                                    consumerResult={
-                                                        consumerResult
-                                                    }
-                                                    validServiceCodes={
-                                                        validServiceCodes
-                                                    }
-                                                />
-
-                                                <ServicesGroupedByType
-                                                    consumerResult={
-                                                        consumerResult
-                                                    }
-                                                    validServiceCodes={
-                                                        validServiceCodes
-                                                    }
-                                                />
-
-                                                <AssociatedServices
-                                                    consumerResult={
-                                                        consumerResult
-                                                    }
-                                                    validAssociatedServices={
-                                                        validAssociatedServices
-                                                    }
-                                                />
-
-                                                <ServicesByDay
-                                                    consumerResult={
-                                                        consumerResult
-                                                    }
-                                                    multipleEntrances={
-                                                        multipleEntrances
-                                                    }
-                                                />
-                                            </div>
-                                        </AccordionItem>
-                                    ),
-                                )}
-                            </Accordion>
+                            <Button
+                                color="primary"
+                                className="h-10 text-sm font-medium"
+                                onPress={handleStartAnalysis}
+                                isLoading={isAnalyzing}
+                                disabled={isAnalyzing}
+                            >
+                                {isAnalyzing
+                                    ? "Analizando..."
+                                    : "Iniciar Análisis"}
+                            </Button>
                         </div>
-                    )}
+                    </div>
+                </CardBody>
+            </Card>
+
+            {/* Compact results section */}
+            {analysisResults.length > 0 && (
+                <div>
+                    <div className="mb-3 mt-5 flex items-center gap-2">
+                        <h5 className="text-base font-semibold">
+                            Datos por persona
+                        </h5>
+                        <Chip size="sm" color="default" variant="flat">
+                            {analysisResults.length}{" "}
+                            {analysisResults.length === 1
+                                ? "consumidor"
+                                : "consumidores"}
+                        </Chip>
+                    </div>
+
+                    <Accordion variant="splitted" className="gap-2">
+                        {analysisResults.map((consumerResult, index) => (
+                            <AccordionItem
+                                key={consumerResult.consumerName}
+                                aria-label={`Análisis para ${consumerResult.consumerName}`}
+                                classNames={{
+                                    base: "px-3 py-2",
+                                    title: "text-sm",
+                                    trigger: "py-2",
+                                    titleWrapper: "",
+                                    content: "px-1 pt-2",
+                                }}
+                                title={
+                                    <div className="flex w-full items-center justify-between">
+                                        <span className="truncate text-sm font-medium">
+                                            {index + 1}.{" "}
+                                            {consumerResult.consumerName}
+                                        </span>
+                                        <div className="ml-2 flex items-center gap-2">
+                                            {consumerResult.hasErrors && (
+                                                <Chip
+                                                    size="sm"
+                                                    color="danger"
+                                                    variant="flat"
+                                                >
+                                                    {consumerResult.errorCount}{" "}
+                                                    {consumerResult.errorCount ===
+                                                    1
+                                                        ? "error"
+                                                        : "errores"}
+                                                </Chip>
+                                            )}
+                                            <Chip
+                                                size="sm"
+                                                color="primary"
+                                                variant="flat"
+                                            >
+                                                {
+                                                    consumerResult.analysis
+                                                        .filteredData.rows
+                                                        .length
+                                                }{" "}
+                                                {consumerResult.analysis
+                                                    .filteredData.rows
+                                                    .length === 1
+                                                    ? "entrada"
+                                                    : "entradas"}
+                                            </Chip>
+                                        </div>
+                                    </div>
+                                }
+                            >
+                                <div className="space-y-3">
+                                    <WaiverValidationErrors
+                                        consumerResult={consumerResult}
+                                    />
+
+                                    {/* Grid layout for component sections */}
+                                    <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+                                        <ServicesGroupedByType
+                                            consumerResult={consumerResult}
+                                            validServiceCodes={
+                                                validServiceCodes
+                                            }
+                                        />
+                                        <AssociatedServices
+                                            consumerResult={consumerResult}
+                                            validAssociatedServices={
+                                                validAssociatedServices
+                                            }
+                                        />
+                                    </div>
+
+                                    <ServicesByDay
+                                        consumerResult={consumerResult}
+                                        multipleEntrances={multipleEntrances}
+                                    />
+                                </div>
+                            </AccordionItem>
+                        ))}
+                    </Accordion>
                 </div>
-            </CardBody>
-        </Card>
+            )}
+        </div>
     );
 }
 

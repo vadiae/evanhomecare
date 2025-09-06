@@ -1,6 +1,8 @@
 "use client";
 
 import {
+    Accordion,
+    AccordionItem,
     Button,
     Card,
     CardBody,
@@ -25,15 +27,7 @@ export default function TabsSection({
     distinctConsumerNames,
     rows,
 }: TabsSectionProps) {
-    const [activeTab, setActiveTab] = useState<
-        "consumers" | "data" | "general"
-    >("consumers");
-    const [isVisible, setIsVisible] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-
-    const toggleVisibility = () => {
-        setIsVisible(!isVisible);
-    };
 
     if (!distinctConsumerNames?.length && !rows?.length) {
         return null;
@@ -49,159 +43,128 @@ export default function TabsSection({
 
     return (
         <div className="mb-6 mt-6">
-            <div className="mb-6 flex flex-wrap gap-2">
-                <Button
-                    variant={activeTab === "consumers" ? "solid" : "bordered"}
-                    color="primary"
+            <Accordion variant="splitted">
+                <AccordionItem
+                    key="consumers"
+                    aria-label="Consumers"
                     startContent={<FiUsers />}
-                    onClick={() => setActiveTab("consumers")}
+                    title="Consumers"
                 >
-                    Consumers
-                </Button>
-                <Button
-                    variant={activeTab === "data" ? "solid" : "bordered"}
-                    color="primary"
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        {distinctConsumerNames.map((name, index) => (
+                            <Card key={index} className="bg-primary/5">
+                                <CardBody className="p-4">
+                                    <div className="flex items-center justify-between">
+                                        <span className="font-medium text-gray-800">
+                                            {name}
+                                        </span>
+                                        <Chip
+                                            size="sm"
+                                            variant="flat"
+                                            color="primary"
+                                        >
+                                            #{index + 1}
+                                        </Chip>
+                                    </div>
+                                </CardBody>
+                            </Card>
+                        ))}
+                    </div>
+                    <p className="mt-4 text-sm text-gray-600">
+                        Total: {distinctConsumerNames.length} consumers
+                    </p>
+                </AccordionItem>
+
+                <AccordionItem
+                    key="data"
+                    aria-label="Data Records"
                     startContent={<FiTable />}
-                    onClick={() => setActiveTab("data")}
+                    title="Data Records"
                 >
-                    Data
-                </Button>
-            </div>
-
-            {activeTab === "consumers" && (
-                <Card>
-                    <CardBody className="p-6">
-                        <div className="mb-4 flex items-center justify-between">
-                            <h4 className="text-lg font-semibold text-gray-800">
-                                Consumer Names
-                            </h4>
-                        </div>
-
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {distinctConsumerNames.map((name, index) => (
-                                <Card key={index} className="bg-primary/5">
-                                    <CardBody className="p-4">
-                                        <div className="flex items-center justify-between">
-                                            <span className="font-medium text-gray-800">
-                                                {name}
-                                            </span>
-                                            <Chip
-                                                size="sm"
-                                                variant="flat"
-                                                color="primary"
-                                            >
-                                                #{index + 1}
-                                            </Chip>
-                                        </div>
-                                    </CardBody>
-                                </Card>
-                            ))}
-                        </div>
-                        <p className="mt-4 text-sm text-gray-600">
-                            Total: {distinctConsumerNames.length} consumers
-                        </p>
-                    </CardBody>
-                </Card>
-            )}
-
-            {activeTab === "data" && (
-                <Card>
-                    <CardBody className="p-6">
-                        <div className="mb-4 flex items-center justify-between">
-                            <h4 className="text-lg font-semibold text-gray-800">
-                                Data Records
-                            </h4>
-                            <Button
-                                size="sm"
-                                color="secondary"
-                                startContent={<FiDownload />}
-                                onClick={() => {
-                                    const csvContent = [
-                                        headers.join(","),
-                                        ...rows.map((row) =>
-                                            headers
-                                                .map(
-                                                    (header) =>
-                                                        `"${
-                                                            row[
-                                                                header as keyof typeof row
-                                                            ]
-                                                        }"`,
-                                                )
-                                                .join(","),
-                                        ),
-                                    ].join("\n");
-                                    const blob = new Blob([csvContent], {
-                                        type: "text/csv",
-                                    });
-                                    const url = URL.createObjectURL(blob);
-                                    const a = document.createElement("a");
-                                    a.href = url;
-                                    a.download = "data.csv";
-                                    a.click();
-                                    URL.revokeObjectURL(url);
-                                }}
-                            >
-                                Export CSV
-                            </Button>
-                        </div>
-
-                        <div className="mb-4 space-y-2 text-sm text-gray-500">
+                    <div className="mb-4 flex items-center justify-between">
+                        <div className="space-y-2 text-sm text-gray-500">
                             <div className="flex flex-wrap gap-4">
                                 <p>Total Records: {rows?.length}</p>
                                 <p>Filtered Records: {filteredRows?.length}</p>
                                 <p>Columns: {headers?.length}</p>
                             </div>
                         </div>
-
-                        <div className="mb-4">
-                            <Input
-                                startContent={<FiSearch />}
-                                placeholder="Search in all columns..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full"
-                            />
-                        </div>
-
-                        <div className="max-h-96 overflow-auto">
-                            <Table aria-label="Data records">
-                                <TableHeader>
-                                    {headers.map((header) => (
-                                        <TableColumn key={header}>
-                                            {header}
-                                        </TableColumn>
-                                    ))}
-                                </TableHeader>
-                                <TableBody>
-                                    {filteredRows.map((row, index) => (
-                                        <TableRow key={index}>
-                                            {headers.map(
-                                                (header, cellIndex) => {
-                                                    const value =
+                        <Button
+                            size="sm"
+                            color="secondary"
+                            startContent={<FiDownload />}
+                            onClick={() => {
+                                const csvContent = [
+                                    headers.join(","),
+                                    ...rows.map((row) =>
+                                        headers
+                                            .map(
+                                                (header) =>
+                                                    `"${
                                                         row[
                                                             header as keyof typeof row
-                                                        ];
-                                                    return (
-                                                        <TableCell
-                                                            key={cellIndex}
-                                                        >
-                                                            {value !== null &&
-                                                            value !== undefined
-                                                                ? String(value)
-                                                                : "NULL"}
-                                                        </TableCell>
-                                                    );
-                                                },
-                                            )}
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </div>
-                    </CardBody>
-                </Card>
-            )}
+                                                        ]
+                                                    }"`,
+                                            )
+                                            .join(","),
+                                    ),
+                                ].join("\n");
+                                const blob = new Blob([csvContent], {
+                                    type: "text/csv",
+                                });
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement("a");
+                                a.href = url;
+                                a.download = "data.csv";
+                                a.click();
+                                URL.revokeObjectURL(url);
+                            }}
+                        >
+                            Export CSV
+                        </Button>
+                    </div>
+
+                    <div className="mb-4">
+                        <Input
+                            startContent={<FiSearch />}
+                            placeholder="Search in all columns..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full"
+                        />
+                    </div>
+
+                    <div className="max-h-96 overflow-auto">
+                        <Table aria-label="Data records">
+                            <TableHeader>
+                                {headers.map((header) => (
+                                    <TableColumn key={header}>
+                                        {header}
+                                    </TableColumn>
+                                ))}
+                            </TableHeader>
+                            <TableBody>
+                                {filteredRows.map((row, index) => (
+                                    <TableRow key={index}>
+                                        {headers.map((header, cellIndex) => {
+                                            const value =
+                                                row[header as keyof typeof row];
+                                            return (
+                                                <TableCell key={cellIndex}>
+                                                    {value !== null &&
+                                                    value !== undefined
+                                                        ? String(value)
+                                                        : "NULL"}
+                                                </TableCell>
+                                            );
+                                        })}
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </AccordionItem>
+            </Accordion>
         </div>
     );
 }
