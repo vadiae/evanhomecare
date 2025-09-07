@@ -1,33 +1,10 @@
 "use client";
 
-import {
-    Button,
-    Card,
-    CardBody,
-    Chip,
-    Spinner,
-    Tabs,
-    Tab,
-} from "@heroui/react";
-import React, { useRef, useState } from "react";
-import { FiDatabase, FiUpload, FiUsers, FiBarChart } from "react-icons/fi";
-import { Title } from "~/components/Titles/Title";
+import { Tabs, Tab } from "@heroui/react";
+import React, { useState } from "react";
+import { FiUsers, FiBarChart } from "react-icons/fi";
 import Analyzer from "~/modules/Analysis/analyzer/Analyzer";
 import UserData from "~/modules/Analysis/admin/UserData";
-
-interface JsonData {
-    extractionInfo: {
-        startDate: string;
-        endDate: string;
-    };
-    headers: string[];
-    rows: any[][];
-    consumerNames?: string[];
-    reportDate?: string;
-    recordsAmount?: number;
-    startDate?: string;
-    endDate?: string;
-}
 
 export default function AnalysisSection({
     user,
@@ -35,63 +12,6 @@ export default function AnalysisSection({
     user: { email: string; name: string; role: string } | null;
 }) {
     const [activeTab, setActiveTab] = useState("analysis");
-    const [isLoading, setIsLoading] = useState(false);
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [headers, setHeaders] = useState<string[]>([]);
-    const [rows, setRows] = useState<any[][]>([]);
-    const [error, setError] = useState<string>("");
-    const [distinctConsumerNames, setDistinctConsumerNames] = useState<
-        string[]
-    >([]);
-    const [startDate, setStartDate] = useState<string>("");
-    const [endDate, setEndDate] = useState<string>("");
-
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file && file.name.endsWith(".json")) {
-            setSelectedFile(file);
-            void handleFileUpload(file);
-        }
-    };
-
-    const handleFileUpload = async (file: File) => {
-        setIsLoading(true);
-        setError("");
-        setRows([]);
-        setHeaders([]);
-        setDistinctConsumerNames([]);
-        setStartDate("");
-        setEndDate("");
-
-        try {
-            const text = await file.text();
-            const jsonData: JsonData = JSON.parse(text);
-
-            await processJsonData(jsonData);
-        } catch (error) {
-            setError("Error loading JSON file: " + (error as Error).message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const processJsonData = async (jsonData: JsonData) => {
-        try {
-            setHeaders(jsonData.headers);
-            setRows(jsonData.rows);
-            setStartDate(jsonData.extractionInfo.startDate || "");
-            setEndDate(jsonData.extractionInfo.endDate || "");
-
-            if (jsonData.consumerNames) {
-                setDistinctConsumerNames(jsonData.consumerNames);
-            }
-        } catch (error) {
-            console.error("Error processing JSON data:", error);
-            setError("Error processing JSON data: " + (error as Error).message);
-        }
-    };
 
     return (
         <main>
@@ -147,154 +67,7 @@ export default function AnalysisSection({
                         </Tabs>
 
                         {/* Tab Content */}
-                        {activeTab === "analysis" && (
-                            <>
-                                <Title title="Data Analysis" />
-
-                                <div className="mb-8 grid gap-4 md:grid-cols-2">
-                                    <Card className="bg-gradient-to-br from-primary/5 to-transparent">
-                                        <CardBody className="p-8">
-                                            <div className="flex flex-col items-center gap-6">
-                                                <div className="flex items-center gap-3">
-                                                    <FiDatabase className="h-8 w-8 text-primary" />
-                                                    <h3 className="text-xl font-semibold text-gray-800">
-                                                        Subir archivo JSON
-                                                    </h3>
-                                                </div>
-
-                                                <div className="flex flex-col items-center gap-4">
-                                                    <input
-                                                        ref={fileInputRef}
-                                                        type="file"
-                                                        accept=".json"
-                                                        onChange={
-                                                            handleFileSelect
-                                                        }
-                                                        className="hidden"
-                                                    />
-                                                    <Button
-                                                        color="primary"
-                                                        variant="bordered"
-                                                        startContent={
-                                                            <FiUpload />
-                                                        }
-                                                        onPress={() =>
-                                                            fileInputRef.current?.click()
-                                                        }
-                                                        className="min-w-[200px]"
-                                                    >
-                                                        Escoge un archivo JSON
-                                                    </Button>
-                                                    {selectedFile && (
-                                                        <Chip
-                                                            color="success"
-                                                            variant="flat"
-                                                        >
-                                                            {selectedFile.name}
-                                                        </Chip>
-                                                    )}
-                                                </div>
-                                                {error && (
-                                                    <div className="w-full rounded-lg border border-red-200 bg-red-50 p-3">
-                                                        <p className="text-sm text-red-600">
-                                                            {error}
-                                                        </p>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </CardBody>
-                                    </Card>
-
-                                    <Card>
-                                        <CardBody className="p-6">
-                                            <h4 className="mb-4 text-lg font-semibold text-gray-800">
-                                                Cómo usar:
-                                            </h4>
-                                            <ul className="space-y-2 text-sm text-gray-700">
-                                                <li>
-                                                    • Usa el selector de
-                                                    archivos para subir
-                                                    cualquier archivo .json con
-                                                    tus datos
-                                                </li>
-                                                <li>
-                                                    • El JSON debe contener
-                                                    headers, rows, y
-                                                    consumerNames
-                                                </li>
-                                                <li>
-                                                    • Funciona completamente en
-                                                    el navegador - no requiere
-                                                    servidor
-                                                </li>
-                                            </ul>
-                                        </CardBody>
-                                    </Card>
-                                </div>
-
-                                {isLoading && (
-                                    <div className="flex justify-center py-8">
-                                        <Spinner size="lg" color="primary" />
-                                    </div>
-                                )}
-
-                                {rows?.length > 0 && (
-                                    <Analyzer
-                                        data={{
-                                            rows,
-                                            columns: headers,
-                                            startDate,
-                                            endDate,
-                                        }}
-                                        distinctConsumerNames={
-                                            distinctConsumerNames
-                                        }
-                                    />
-                                )}
-
-                                {/* <TabsSection
-                                    distinctConsumerNames={distinctConsumerNames}
-                                    rows={rows}
-                                /> */}
-
-                                {!rows && isLoading === false && (
-                                    <Card className="mt-6">
-                                        <CardBody className="p-6">
-                                            <div className="text-center text-gray-500">
-                                                <FiDatabase className="mx-auto mb-4 h-12 w-12 opacity-50" />
-                                                <h4 className="mb-2 text-lg font-semibold">
-                                                    Invalid Data Format
-                                                </h4>
-                                                <p className="text-sm">
-                                                    The uploaded file does not
-                                                    contain valid data. Please
-                                                    ensure your JSON file
-                                                    includes the required data
-                                                    structure.
-                                                </p>
-                                            </div>
-                                        </CardBody>
-                                    </Card>
-                                )}
-
-                                {rows?.length === 0 && (
-                                    <Card className="mt-6">
-                                        <CardBody className="p-6">
-                                            <div className="text-center text-gray-500">
-                                                <FiDatabase className="mx-auto mb-4 h-12 w-12 opacity-50" />
-                                                <h4 className="mb-2 text-lg font-semibold">
-                                                    No Data Available
-                                                </h4>
-                                                <p className="text-sm">
-                                                    Upload a JSON file to view
-                                                    and analyze the data.
-                                                </p>
-                                            </div>
-                                        </CardBody>
-                                    </Card>
-                                )}
-                            </>
-                        )}
+                        {activeTab === "analysis" && <Analyzer />}
 
                         {activeTab === "userdata" &&
                             user &&
