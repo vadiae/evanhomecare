@@ -20,6 +20,7 @@ export interface ClientSchedule {
     clientId: string;
     clientName: string;
     startDate: string;
+    endDate: string;
     service: string;
     monday: number | null;
     tuesday: number | null;
@@ -400,28 +401,43 @@ export function analyzeScheduleActivityMismatches(
             return null;
         }
 
-        // Filter by service code and date, then get most recent
-        const filteredSchedules = clientSchedules
-            .filter((schedule: ClientSchedule) => {
+        // Parse activity date
+        const activityDateObj = new Date(
+            2000 + parseInt(activityDate.split("/")[2]!, 10),
+            parseInt(activityDate.split("/")[0]!, 10) - 1,
+            parseInt(activityDate.split("/")[1]!, 10),
+        );
+
+        // Filter by service code and date range
+        const applicableSchedules = clientSchedules.filter(
+            (schedule: ClientSchedule) => {
+                if (schedule.service !== serviceCode) {
+                    return false;
+                }
+
                 const scheduleStart = new Date(schedule.startDate);
-                const activityDateObj = new Date(
-                    2000 + parseInt(activityDate.split("/")[2]!, 10),
-                    parseInt(activityDate.split("/")[0]!, 10) - 1,
-                    parseInt(activityDate.split("/")[1]!, 10),
-                );
+                const scheduleEnd = new Date(schedule.endDate);
 
+                // Check if activity date falls within the schedule date range
                 return (
-                    schedule.service === serviceCode &&
-                    activityDateObj >= scheduleStart
+                    activityDateObj >= scheduleStart &&
+                    activityDateObj <= scheduleEnd
                 );
-            })
-            .sort(
-                (a: ClientSchedule, b: ClientSchedule) =>
-                    new Date(b.startDate).getTime() -
-                    new Date(a.startDate).getTime(),
-            );
+            },
+        );
 
-        return filteredSchedules[0] || null; // Get most recent schedule
+        // If multiple schedules apply, get the most recent one (latest start date)
+        if (applicableSchedules.length > 0) {
+            return (
+                applicableSchedules.sort(
+                    (a: ClientSchedule, b: ClientSchedule) =>
+                        new Date(b.startDate).getTime() -
+                        new Date(a.startDate).getTime(),
+                )[0] || null
+            );
+        }
+
+        return null;
     }
 
     // Process each person's activities

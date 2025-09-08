@@ -49,6 +49,7 @@ export const ClientSchedule = pgTable("client_schedule", {
     clientId: varchar("client_id").notNull(),
     clientName: varchar("client_name").notNull(),
     startDate: timestamp("start_date").notNull(),
+    endDate: timestamp("end_date").notNull(),
     service: varchar("service").notNull(),
     monday: integer("monday"),
     tuesday: integer("tuesday"),
