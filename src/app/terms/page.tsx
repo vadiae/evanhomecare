@@ -492,7 +492,7 @@ export default function TermsPage() {
                                             <span className="font-semibold text-white">
                                                 📞
                                             </span>
-                                            <p>(321) 300-9047</p>
+                                            <p>(321) 300-9077</p>
                                         </div>
 
                                         <div className="flex items-center space-x-3">
