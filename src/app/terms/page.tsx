@@ -1,8 +1,6 @@
-import React from "react";
 import { Card, CardBody } from "@heroui/react";
-import { Title } from "~/components/Titles/Title";
 import { CustomNavbar } from "~/components/Navbar/Navbar";
-import { Footer } from "~/components/Footer/Footer";
+import { Title } from "~/components/Titles/Title";
 
 export default function TermsPage() {
     return (
