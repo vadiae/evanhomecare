@@ -3,8 +3,12 @@
 import { Tabs, Tab } from "@heroui/react";
 import React, { useState } from "react";
 import { FiUsers, FiBarChart } from "react-icons/fi";
+import dynamic from "next/dynamic";
 import Analyzer from "~/modules/Analysis/analyzer/Analyzer";
-import UserData from "~/modules/Analysis/admin/UserData";
+
+const UserData = dynamic(() => import("~/modules/Analysis/admin/UserData"), {
+    ssr: false,
+});
 
 export default function AnalysisSection({
     user,
