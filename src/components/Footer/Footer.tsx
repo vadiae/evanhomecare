@@ -5,6 +5,8 @@ import { IoMail } from "react-icons/io5";
 import { LiaFaxSolid } from "react-icons/lia";
 import { MdOutlineBadge } from "react-icons/md";
 import { PiPhoneCallThin } from "react-icons/pi";
+import { FaShieldAlt } from "react-icons/fa";
+import { FaFileContract } from "react-icons/fa";
 import { FooterActionsWrapper } from "./FooterWrapper";
 
 export function Footer() {
@@ -94,10 +96,33 @@ export function Footer() {
                     </div>
                 </div>
 
-                <p className="text-center font-bold text-white">
-                    © {new Date().getFullYear()} Evan Home Care, LLC. All
-                    Rights Reserved.
-                </p>
+                <div className="text-center">
+                    <p className="font-bold text-white">
+                        © {new Date().getFullYear()} Evan Home Care, LLC. All
+                        Rights Reserved.
+                    </p>
+                    <div className="mt-3 flex justify-center space-x-6">
+                        <a
+                            href="/privacy"
+                            className="flex items-center gap-2 text-white underline transition-colors duration-200 hover:text-gray-200"
+                        >
+                            <FaShieldAlt className="h-4 w-4" />
+                            <span className="mt-1 text-white">
+                                Privacy Policy
+                            </span>
+                        </a>
+                        <span className="mt-1 text-white">|</span>
+                        <a
+                            href="/terms"
+                            className="flex items-center gap-2 text-white underline transition-colors duration-200 hover:text-gray-200"
+                        >
+                            <FaFileContract className="h-4 w-4" />
+                            <span className="mt-1 text-white">
+                                Terms of Service
+                            </span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     );

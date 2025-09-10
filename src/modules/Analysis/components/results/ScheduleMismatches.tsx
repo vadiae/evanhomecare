@@ -91,10 +91,13 @@ export function ScheduleMismatches({ mismatches }: ScheduleMismatchesProps) {
         try {
             const [month, day, year] = dateString.split("/");
             const fullYear = `${year}`;
+            const fullMonth = `${month}`;
+            const fullDay = `${day}`;
+
             return new Date(
                 parseInt(fullYear),
-                parseInt(month) - 1,
-                parseInt(day),
+                parseInt(fullMonth) - 1,
+                parseInt(fullDay),
             ).toLocaleDateString("es-ES", {
                 weekday: "long",
                 year: "numeric",
@@ -333,23 +336,30 @@ export function ScheduleMismatches({ mismatches }: ScheduleMismatchesProps) {
                                                                             >
                                                                                 <TableCell>
                                                                                     {
+                                                                                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                                                                                         activity.Date
                                                                                     }
                                                                                 </TableCell>
                                                                                 <TableCell>
                                                                                     {
                                                                                         activity[
+                                                                                            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                                                                                             "Service Code"
                                                                                         ]
                                                                                     }
                                                                                 </TableCell>
                                                                                 <TableCell>
-                                                                                    {activity.Units ||
-                                                                                        activity.units ||
-                                                                                        0}
+                                                                                    {
+                                                                                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                                                                                        activity.Units ||
+                                                                                            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                                                                                            activity.units ||
+                                                                                            0
+                                                                                    }
                                                                                 </TableCell>
                                                                                 <TableCell>
                                                                                     {activity[
+                                                                                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                                                                                         "Documentation Type"
                                                                                     ] ||
                                                                                         "N/A"}
