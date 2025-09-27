@@ -80,13 +80,19 @@ function Analyzer() {
 
     const buildPredictiveCsv = (
         mismatchesByPerson: Record<string, PredictiveMismatch[]>,
+        totalsByPersonParam?: Record<string, Record<string, number>>,
     ): string => {
-        const header = ["Customer Name", "Date of Service", "Service", "Error"];
+        const headerErrores = ["Cliente", "Fecha", "Servicio", "Error"];
 
         const escapeCsv = (value: string) => `"${value.replace(/"/g, '""')}"`;
 
         const rows: string[] = [];
-        rows.push(header.map(escapeCsv).join(","));
+
+        // Título de sección de errores
+        rows.push(
+            escapeCsv("Errores detectados + Servicios Totales Por cliente"),
+        );
+        rows.push(headerErrores.map(escapeCsv).join(","));
 
         Object.entries(mismatchesByPerson)
             .sort(([a], [b]) => a.localeCompare(b))
@@ -123,6 +129,39 @@ function Analyzer() {
                         ].map((v) => escapeCsv(String(v)));
                         rows.push(line.join(","));
                     });
+            });
+
+        // Línea en blanco
+        rows.push("");
+
+        // Subtítulo (mismo estilo que "Errores detectados")
+        rows.push(escapeCsv("Servicios Totales Por cliente"));
+
+        // Totales por cliente en una sola fila por cliente (columnas = servicios)
+        const totalsByPerson = totalsByPersonParam || {};
+        const allServices = Array.from(
+            new Set(
+                Object.values(totalsByPerson).flatMap((t) =>
+                    Object.keys(t || {}),
+                ),
+            ),
+        ).sort((a, b) => a.localeCompare(b));
+
+        // Encabezado: Cliente + cada servicio
+        const headerTotalesPivot = ["Cliente", ...allServices];
+        rows.push(headerTotalesPivot.map(escapeCsv).join(","));
+
+        // Filas: una por cliente
+        Object.entries(totalsByPerson)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .forEach(([personKey, totals]) => {
+                const dataRow = [
+                    personKey,
+                    ...allServices.map((service) =>
+                        String(totals[service] || 0),
+                    ),
+                ];
+                rows.push(dataRow.map((v) => escapeCsv(String(v))).join(","));
             });
 
         return rows.join("\n");
@@ -364,6 +403,7 @@ function Analyzer() {
                 }
                 const csv = buildPredictiveCsv(
                     results as Record<string, PredictiveMismatch[]>,
+                    totalsByPerson,
                 );
                 const blob = new Blob([csv], {
                     type: "text/csv;charset=utf-8;",
