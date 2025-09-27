@@ -19,7 +19,7 @@ import { ServicesByDay } from "../components/results/ServicesByDay";
 import { ServicesGroupedByType } from "../components/results/ServicesGroupedByType";
 import { WaiverValidationErrors } from "../components/results/WaiverValidationErrors";
 import { validAssociatedServices, validServiceCodes } from "./constants";
-import { type ConsumerAnalysisResult } from "./types";
+import { type ConsumerAnalysisResult, type DataRow } from "./types";
 import {
     type ClientSchedule,
     type ProcessedData,
@@ -57,6 +57,12 @@ function Analyzer() {
     const [endDate, setEndDate] = useState<string>("");
 
     const [mismatches, setMismatches] = useState<Record<string, any[]>>({});
+    const [serviceTotalsByPerson, setServiceTotalsByPerson] = useState<
+        Record<string, Record<string, number>>
+    >({});
+    const [globalServiceTotals, setGlobalServiceTotals] = useState<
+        Record<string, number>
+    >({});
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -150,12 +156,12 @@ function Analyzer() {
             }
 
             const groupedRows = rows.reduce(
-                (acc: Record<string, any[]>, row: any) => {
+                (acc: Record<string, DataRow[]>, row: unknown) => {
                     // Extract the ID from consumerName format: "Name, LastName ('someID')"
                     const consumerName =
                         typeof row === "object" &&
                         row !== null &&
-                        "consumerName" in row
+                        "consumerName" in (row as Record<string, unknown>)
                             ? String(
                                   (row as Record<string, unknown>).consumerName,
                               )
@@ -167,18 +173,120 @@ function Analyzer() {
                     const id = idMatch?.[1] || consumerName;
 
                     if (typeof id === "string" && id && !acc[id]) {
-                        acc[id] = [];
+                        acc[id] = [] as DataRow[];
                     }
                     if (typeof id === "string" && id) {
-                        acc[id]!.push(row);
+                        acc[id]!.push(row as DataRow);
                     }
                     return acc;
                 },
-                {} as Record<string, any[]>,
+                {} as Record<string, DataRow[]>,
             );
 
+            type MismatchActivity = {
+                Date: string;
+                "Service Code": string;
+                Units?: string | number;
+                units?: string | number;
+                "Documentation Type"?: string;
+                [key: string]: any;
+            };
+
+            const activitiesByPerson: Record<string, MismatchActivity[]> =
+                Object.entries(groupedRows).reduce(
+                    (
+                        acc: Record<string, MismatchActivity[]>,
+                        [personKey, personRows],
+                    ) => {
+                        const activities: MismatchActivity[] = personRows
+                            .map((r: DataRow) => {
+                                const dateValue = r.Date ?? r.date ?? "";
+                                const serviceValue =
+                                    r["Service Code"] ?? r.serviceCode ?? "";
+                                const unitsValue = r.Units ?? r.units;
+                                const docTypeValue =
+                                    (r as Record<string, unknown>)[
+                                        "Documentation Type"
+                                    ] ?? r.documentationType;
+
+                                const date = String(dateValue || "");
+                                const serviceCode = String(serviceValue || "");
+
+                                if (!date || !serviceCode) {
+                                    return null;
+                                }
+
+                                const activity: MismatchActivity = {
+                                    Date: date,
+                                    "Service Code": serviceCode,
+                                    Units: unitsValue,
+                                    units: unitsValue as any,
+                                };
+
+                                if (typeof docTypeValue === "string") {
+                                    activity["Documentation Type"] =
+                                        docTypeValue;
+                                }
+
+                                return activity;
+                            })
+                            .filter(
+                                (
+                                    a: MismatchActivity | null,
+                                ): a is MismatchActivity => a !== null,
+                            );
+
+                        acc[personKey] = activities;
+                        return acc;
+                    },
+                    {},
+                );
+
+            // Compute total units per service for each person (using same keys as groupedRows)
+            const totalsByPerson = Object.entries(groupedRows).reduce(
+                (
+                    acc: Record<string, Record<string, number>>,
+                    [personKey, personRows],
+                ) => {
+                    const totals: Record<string, number> = {};
+                    personRows.forEach((r: DataRow) => {
+                        const scv = r["Service Code"];
+                        const serviceCode =
+                            typeof scv === "string" ? scv : "Unknown";
+                        const uv = (r.Units ?? r.units) as
+                            | string
+                            | number
+                            | undefined;
+                        const units =
+                            typeof uv === "string" || typeof uv === "number"
+                                ? parseFloat(String(uv))
+                                : 0;
+                        totals[serviceCode] =
+                            (totals[serviceCode] || 0) +
+                            (isNaN(units) ? 0 : units);
+                    });
+                    acc[personKey] = totals;
+                    return acc;
+                },
+                {},
+            );
+
+            setServiceTotalsByPerson(totalsByPerson);
+
+            // Compute global totals across all customers by aggregating per-person totals
+            const globalTotals = Object.values(totalsByPerson).reduce(
+                (acc: Record<string, number>, personTotals) => {
+                    Object.entries(personTotals).forEach(([service, total]) => {
+                        acc[service] = (acc[service] || 0) + total;
+                    });
+                    return acc;
+                },
+                {},
+            );
+            setGlobalServiceTotals(globalTotals);
+
             const results = analyzeScheduleActivityMismatches(
-                groupedRows,
+                activitiesByPerson,
                 scheduleData.schedules,
             );
 
@@ -456,7 +564,11 @@ function Analyzer() {
             {/* Schedule Mismatches Section */}
             {Object.keys(mismatches).length > 0 && (
                 <div className="mb-6">
-                    <ScheduleMismatches mismatches={mismatches} />
+                    <ScheduleMismatches
+                        mismatches={mismatches}
+                        serviceTotalsByPerson={serviceTotalsByPerson}
+                        globalServiceTotals={globalServiceTotals}
+                    />
                 </div>
             )}
 

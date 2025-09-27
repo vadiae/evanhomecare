@@ -41,11 +41,17 @@ interface ScheduleMismatch {
     };
 }
 
-interface ScheduleMismatchesProps {
+export interface ScheduleMismatchesProps {
     mismatches: Record<string, ScheduleMismatch[]>;
+    serviceTotalsByPerson?: Record<string, Record<string, number>>;
+    globalServiceTotals?: Record<string, number>;
 }
 
-export function ScheduleMismatches({ mismatches }: ScheduleMismatchesProps) {
+export const ScheduleMismatches: React.FC<ScheduleMismatchesProps> = ({
+    mismatches,
+    serviceTotalsByPerson,
+    globalServiceTotals,
+}: ScheduleMismatchesProps) => {
     if (!mismatches || Object.keys(mismatches).length === 0) {
         return (
             <Card className="border-0 shadow-lg">
@@ -137,6 +143,35 @@ export function ScheduleMismatches({ mismatches }: ScheduleMismatchesProps) {
                     </Chip>
                 </div>
 
+                {/* Global Totals Summary */}
+                {globalServiceTotals &&
+                    Object.keys(globalServiceTotals).length > 0 && (
+                        <Card className="mb-4 border border-gray-100 bg-white">
+                            <CardBody className="p-4">
+                                <div className="mb-2 text-sm font-semibold text-gray-700">
+                                    Total global de unidades por servicio
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {Object.entries(globalServiceTotals)
+                                        .sort((a, b) =>
+                                            a[0].localeCompare(b[0]),
+                                        )
+                                        .map(([service, total]) => (
+                                            <Chip
+                                                key={`global-${service}`}
+                                                size="sm"
+                                                color="secondary"
+                                                variant="flat"
+                                                className="font-medium"
+                                            >
+                                                {service}: {total}
+                                            </Chip>
+                                        ))}
+                                </div>
+                            </CardBody>
+                        </Card>
+                    )}
+
                 <Accordion variant="splitted" className="gap-3">
                     {Object.entries(mismatches).map(
                         ([personName, personMismatches]) => (
@@ -173,6 +208,50 @@ export function ScheduleMismatches({ mismatches }: ScheduleMismatchesProps) {
                                 }
                             >
                                 <div className="space-y-4">
+                                    {/* Totals by Service Summary */}
+                                    {serviceTotalsByPerson &&
+                                        serviceTotalsByPerson[personName] && (
+                                            <Card className="border border-gray-100 bg-white">
+                                                <CardBody className="p-4">
+                                                    <div className="mb-2 text-sm font-semibold text-gray-700">
+                                                        Unidades por servicio
+                                                    </div>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {Object.entries(
+                                                            serviceTotalsByPerson[
+                                                                personName
+                                                            ]!,
+                                                        )
+                                                            .sort((a, b) =>
+                                                                a[0].localeCompare(
+                                                                    b[0],
+                                                                ),
+                                                            )
+                                                            .map(
+                                                                ([
+                                                                    service,
+                                                                    total,
+                                                                ]) => (
+                                                                    <Chip
+                                                                        key={`${personName}-${service}`}
+                                                                        size="sm"
+                                                                        color="primary"
+                                                                        variant="flat"
+                                                                        className="font-medium"
+                                                                    >
+                                                                        {
+                                                                            service
+                                                                        }
+                                                                        :{" "}
+                                                                        {total}
+                                                                    </Chip>
+                                                                ),
+                                                            )}
+                                                    </div>
+                                                </CardBody>
+                                            </Card>
+                                        )}
+
                                     {personMismatches.map((mismatch, index) => (
                                         <Card
                                             key={index}
@@ -430,4 +509,4 @@ export function ScheduleMismatches({ mismatches }: ScheduleMismatchesProps) {
             </div>
         </div>
     );
-}
+};
