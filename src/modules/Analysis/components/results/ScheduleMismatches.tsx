@@ -47,6 +47,8 @@ export interface ScheduleMismatchesProps {
     globalServiceTotals?: Record<string, number>;
     predictiveReportUrl?: string;
     predictiveReportFilename?: string;
+    analysisStartDate?: string;
+    analysisEndDate?: string;
 }
 
 export const ScheduleMismatches: React.FC<ScheduleMismatchesProps> = ({
@@ -55,6 +57,8 @@ export const ScheduleMismatches: React.FC<ScheduleMismatchesProps> = ({
     globalServiceTotals,
     predictiveReportUrl,
     predictiveReportFilename,
+    analysisStartDate,
+    analysisEndDate,
 }: ScheduleMismatchesProps) => {
     if (!mismatches || Object.keys(mismatches).length === 0) {
         return (
@@ -119,6 +123,43 @@ export const ScheduleMismatches: React.FC<ScheduleMismatchesProps> = ({
         }
     };
 
+    const formatRangeDate = (dateString: string) => {
+        try {
+            const parseLocalDate = (s: string): Date | null => {
+                if (s.includes("/")) {
+                    const [mm, dd, yy] = s.split("/");
+                    let year = parseInt(yy || "", 10);
+                    if (!isNaN(year) && yy && yy.length <= 2) {
+                        year = 2000 + year;
+                    }
+                    const month = parseInt(mm || "", 10) - 1;
+                    const day = parseInt(dd || "", 10);
+                    const d = new Date(year, month, day);
+                    return isNaN(d.getTime()) ? null : d;
+                }
+                if (s.includes("-")) {
+                    const [yyyy, mm, dd] = s.split("-");
+                    const year = parseInt(yyyy || "", 10);
+                    const month = parseInt(mm || "", 10) - 1;
+                    const day = parseInt(dd || "", 10);
+                    const d = new Date(year, month, day);
+                    return isNaN(d.getTime()) ? null : d;
+                }
+                return null;
+            };
+
+            const local = parseLocalDate(dateString) || new Date(dateString);
+            if (isNaN(local.getTime())) return dateString;
+            return local.toLocaleDateString("es-ES", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+            });
+        } catch {
+            return dateString;
+        }
+    };
+
     return (
         <div className="">
             <div className="">
@@ -155,6 +196,20 @@ export const ScheduleMismatches: React.FC<ScheduleMismatchesProps> = ({
                                 <div className="mb-2 text-sm font-semibold text-gray-700">
                                     Total global de unidades por servicio
                                 </div>
+                                {(analysisStartDate || analysisEndDate) && (
+                                    <div className="mb-3 text-xs text-gray-500">
+                                        Rango:{" "}
+                                        {analysisStartDate
+                                            ? formatRangeDate(analysisStartDate)
+                                            : ""}
+                                        {analysisStartDate && analysisEndDate
+                                            ? " — "
+                                            : ""}
+                                        {analysisEndDate
+                                            ? formatRangeDate(analysisEndDate)
+                                            : ""}
+                                    </div>
+                                )}
                                 <div className="flex flex-wrap items-center gap-2">
                                     {Object.entries(globalServiceTotals)
                                         .sort((a, b) =>

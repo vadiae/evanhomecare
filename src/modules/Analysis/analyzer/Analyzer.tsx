@@ -658,6 +658,8 @@ function Analyzer() {
                         globalServiceTotals={globalServiceTotals}
                         predictiveReportUrl={predictiveReportUrl}
                         predictiveReportFilename={predictiveReportFilename}
+                        analysisStartDate={startDate}
+                        analysisEndDate={endDate}
                     />
                 </div>
             )}
