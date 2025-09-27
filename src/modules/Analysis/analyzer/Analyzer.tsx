@@ -63,6 +63,70 @@ function Analyzer() {
     const [globalServiceTotals, setGlobalServiceTotals] = useState<
         Record<string, number>
     >({});
+    const [predictiveReportUrl, setPredictiveReportUrl] = useState<string>("");
+    const [predictiveReportFilename, setPredictiveReportFilename] =
+        useState<string>("");
+
+    type PredictiveMismatch = {
+        personName: string;
+        date: string;
+        serviceCode: string;
+        scheduledUnits: number;
+        actualUnits: number;
+        type?: "NO_SCHEDULE" | "MISSING_ACTIVITY";
+        issue?: string;
+        issues?: string[];
+    };
+
+    const buildPredictiveCsv = (
+        mismatchesByPerson: Record<string, PredictiveMismatch[]>,
+    ): string => {
+        const header = ["Customer Name", "Date of Service", "Service", "Error"];
+
+        const escapeCsv = (value: string) => `"${value.replace(/"/g, '""')}"`;
+
+        const rows: string[] = [];
+        rows.push(header.map(escapeCsv).join(","));
+
+        Object.entries(mismatchesByPerson)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .forEach(([, personMismatches]) => {
+                personMismatches
+                    .slice()
+                    .sort(
+                        (a, b) =>
+                            new Date(a.date).getTime() -
+                            new Date(b.date).getTime(),
+                    )
+                    .forEach((m) => {
+                        const typeMsg =
+                            m.type === "NO_SCHEDULE"
+                                ? "Sin horario"
+                                : m.type === "MISSING_ACTIVITY"
+                                  ? "Actividad faltante"
+                                  : "";
+                        const issuesMsg = m.issue
+                            ? m.issue
+                            : m.issues && m.issues.length > 0
+                              ? m.issues.join("; ")
+                              : "";
+
+                        const errorMsg = [typeMsg, issuesMsg]
+                            .filter(Boolean)
+                            .join(" | ");
+
+                        const line = [
+                            m.personName || "",
+                            m.date || "",
+                            m.serviceCode || "",
+                            errorMsg,
+                        ].map((v) => escapeCsv(String(v)));
+                        rows.push(line.join(","));
+                    });
+            });
+
+        return rows.join("\n");
+    };
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -291,6 +355,30 @@ function Analyzer() {
             );
 
             setMismatches(results as Record<string, any[]>);
+
+            // Build CSV for download
+            try {
+                // Revoke previous URL to avoid memory leaks
+                if (predictiveReportUrl) {
+                    URL.revokeObjectURL(predictiveReportUrl);
+                }
+                const csv = buildPredictiveCsv(
+                    results as Record<string, PredictiveMismatch[]>,
+                );
+                const blob = new Blob([csv], {
+                    type: "text/csv;charset=utf-8;",
+                });
+                const url = URL.createObjectURL(blob);
+                setPredictiveReportUrl(url);
+                const ts = new Date()
+                    .toISOString()
+                    .replace(/[:\-]/g, "")
+                    .replace(".", "")
+                    .slice(0, 15);
+                setPredictiveReportFilename(`predictive_analysis_${ts}.csv`);
+            } catch (e) {
+                console.error("Failed to build predictive CSV:", e);
+            }
         } catch (err) {
             setError("Ocurrió un error durante el análisis predictivo");
             console.error("Predictive analysis error:", err);
@@ -568,6 +656,8 @@ function Analyzer() {
                         mismatches={mismatches}
                         serviceTotalsByPerson={serviceTotalsByPerson}
                         globalServiceTotals={globalServiceTotals}
+                        predictiveReportUrl={predictiveReportUrl}
+                        predictiveReportFilename={predictiveReportFilename}
                     />
                 </div>
             )}

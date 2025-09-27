@@ -45,12 +45,16 @@ export interface ScheduleMismatchesProps {
     mismatches: Record<string, ScheduleMismatch[]>;
     serviceTotalsByPerson?: Record<string, Record<string, number>>;
     globalServiceTotals?: Record<string, number>;
+    predictiveReportUrl?: string;
+    predictiveReportFilename?: string;
 }
 
 export const ScheduleMismatches: React.FC<ScheduleMismatchesProps> = ({
     mismatches,
     serviceTotalsByPerson,
     globalServiceTotals,
+    predictiveReportUrl,
+    predictiveReportFilename,
 }: ScheduleMismatchesProps) => {
     if (!mismatches || Object.keys(mismatches).length === 0) {
         return (
@@ -151,7 +155,7 @@ export const ScheduleMismatches: React.FC<ScheduleMismatchesProps> = ({
                                 <div className="mb-2 text-sm font-semibold text-gray-700">
                                     Total global de unidades por servicio
                                 </div>
-                                <div className="flex flex-wrap gap-2">
+                                <div className="flex flex-wrap items-center gap-2">
                                     {Object.entries(globalServiceTotals)
                                         .sort((a, b) =>
                                             a[0].localeCompare(b[0]),
@@ -167,6 +171,19 @@ export const ScheduleMismatches: React.FC<ScheduleMismatchesProps> = ({
                                                 {service}: {total}
                                             </Chip>
                                         ))}
+
+                                    {predictiveReportUrl &&
+                                        predictiveReportFilename && (
+                                            <a
+                                                href={predictiveReportUrl}
+                                                download={
+                                                    predictiveReportFilename
+                                                }
+                                                className="ml-auto rounded-md bg-primary px-3 py-1.5 text-sm font-semibold text-white hover:bg-primary/90"
+                                            >
+                                                Descargar reporte CSV
+                                            </a>
+                                        )}
                                 </div>
                             </CardBody>
                         </Card>

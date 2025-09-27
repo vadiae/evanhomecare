@@ -91,7 +91,9 @@ export const generateDateRange = (
 ): string[] => {
     const dates: string[] = [];
     const start = new Date(startDate);
+    start.setDate(start.getDate() + 1);
     const end = new Date(endDate);
+    end.setDate(end.getDate() + 1);
 
     // Ensure we're working with valid dates
     if (isNaN(start.getTime()) || isNaN(end.getTime())) {
