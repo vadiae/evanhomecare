@@ -281,48 +281,44 @@ export const ScheduleMismatches: React.FC<ScheduleMismatchesProps> = ({
                             >
                                 <div className="space-y-4">
                                     {/* Totals by Service Summary */}
-                                    {serviceTotalsByPerson &&
-                                        serviceTotalsByPerson[personName] && (
-                                            <Card className="border border-gray-100 bg-white">
-                                                <CardBody className="p-4">
-                                                    <div className="mb-2 text-sm font-semibold text-gray-700">
-                                                        Unidades por servicio
-                                                    </div>
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {Object.entries(
-                                                            serviceTotalsByPerson[
-                                                                personName
-                                                            ]!,
+                                    {serviceTotalsByPerson?.[personName] && (
+                                        <Card className="border border-gray-100 bg-white">
+                                            <CardBody className="p-4">
+                                                <div className="mb-2 text-sm font-semibold text-gray-700">
+                                                    Unidades por servicio
+                                                </div>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {Object.entries(
+                                                        serviceTotalsByPerson[
+                                                            personName
+                                                        ]!,
+                                                    )
+                                                        .sort((a, b) =>
+                                                            a[0].localeCompare(
+                                                                b[0],
+                                                            ),
                                                         )
-                                                            .sort((a, b) =>
-                                                                a[0].localeCompare(
-                                                                    b[0],
-                                                                ),
-                                                            )
-                                                            .map(
-                                                                ([
-                                                                    service,
-                                                                    total,
-                                                                ]) => (
-                                                                    <Chip
-                                                                        key={`${personName}-${service}`}
-                                                                        size="sm"
-                                                                        color="primary"
-                                                                        variant="flat"
-                                                                        className="font-medium"
-                                                                    >
-                                                                        {
-                                                                            service
-                                                                        }
-                                                                        :{" "}
-                                                                        {total}
-                                                                    </Chip>
-                                                                ),
-                                                            )}
-                                                    </div>
-                                                </CardBody>
-                                            </Card>
-                                        )}
+                                                        .map(
+                                                            ([
+                                                                service,
+                                                                total,
+                                                            ]) => (
+                                                                <Chip
+                                                                    key={`${personName}-${service}`}
+                                                                    size="sm"
+                                                                    color="primary"
+                                                                    variant="flat"
+                                                                    className="font-medium"
+                                                                >
+                                                                    {service}:{" "}
+                                                                    {total}
+                                                                </Chip>
+                                                            ),
+                                                        )}
+                                                </div>
+                                            </CardBody>
+                                        </Card>
+                                    )}
 
                                     {personMismatches.map((mismatch, index) => (
                                         <Card
