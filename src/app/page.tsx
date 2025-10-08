@@ -8,6 +8,7 @@ import { HeroSection } from "~/modules/Home/Hero/Hero";
 import { ServicesSection } from "~/modules/Home/Services/ServicesSection";
 import Squares from "~/modules/Home/Squares/Squares";
 import TopSection from "~/modules/Home/TopSection/TopSection";
+import AwardSection from "~/modules/Home/AwardSection/AwardSection";
 
 export default async function Home() {
     return (
@@ -30,6 +31,7 @@ export default async function Home() {
                         <Squares />
                         <AboutUsSection />
                         <ChooseUsSection />
+                        <AwardSection />
                     </div>
 
                     <div className="w-full ">
