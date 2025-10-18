@@ -26,23 +26,46 @@ interface ScheduleMismatch {
         id: number;
         multiple: boolean;
         startDate: string;
+        endDate: string;
     };
 }
+
+// Parses dates in MM/DD/YY or MM/DD/YYYY formats into a Date object.
+function parseMDY(dateString: string): Date {
+    const parts = dateString.split("/");
+    const month = parseInt(parts[0] || "1", 10);
+    const day = parseInt(parts[1] || "1", 10);
+    const yearPart = parts[2] || "0";
+    const yearNum = parseInt(yearPart, 10);
+    const fullYear = yearPart.length <= 2 ? 2000 + yearNum : yearNum;
+    return new Date(fullYear, month - 1, day);
+}
+
+function getDayOfWeek(dateString: string): number {
+    const date = parseMDY(dateString);
+    return date.getDay();
+}
+
+function extractClientId(consumerName: string): string | null {
+    const match = consumerName.match(/\((\d+)\)$/);
+    return match?.[1] || null;
+}
+
+const dayNames = [
+    "sunday",
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+];
 
 export function analyzeScheduleActivityMismatches(
     activitiesByPerson: Record<string, Activity[]>,
     schedules: ClientSchedule[],
 ): Record<string, ScheduleMismatch[]> {
     const mismatches: ScheduleMismatch[] = [];
-    const dayNames = [
-        "sunday",
-        "monday",
-        "tuesday",
-        "wednesday",
-        "thursday",
-        "friday",
-        "saturday",
-    ];
 
     const schedulesByClientId = schedules.reduce(
         (acc: Record<string, ClientSchedule[]>, schedule: ClientSchedule) => {
@@ -56,35 +79,18 @@ export function analyzeScheduleActivityMismatches(
         {} as Record<string, ClientSchedule[]>,
     );
 
-    function getDayOfWeek(dateString: string): number {
-        const parts = dateString.split("/");
-        const month = parseInt(parts[0] || "1", 10);
-        const day = parseInt(parts[1] || "1", 10);
-        const year = parseInt(parts[2] || "0", 10);
-        const date = new Date(2000 + year, month - 1, day);
-        return date.getDay();
-    }
-
-    function extractClientId(consumerName: string): string | null {
-        const match = consumerName.match(/\((\d+)\)$/);
-        return match?.[1] || null;
-    }
-
     function getScheduleForClientService(
         clientId: string,
         serviceCode: string,
         activityDate: string,
     ): ClientSchedule | null {
         const clientSchedules = schedulesByClientId[clientId];
+
         if (!clientSchedules || clientSchedules.length === 0) {
             return null;
         }
 
-        const activityDateObj = new Date(
-            2000 + parseInt(activityDate.split("/")[2]!, 10),
-            parseInt(activityDate.split("/")[0]!, 10) - 1,
-            parseInt(activityDate.split("/")[1]!, 10),
-        );
+        const activityDateObj = parseMDY(activityDate);
 
         const applicableSchedules = clientSchedules.filter(
             (schedule: ClientSchedule) => {
@@ -142,6 +148,7 @@ export function analyzeScheduleActivityMismatches(
                     serviceCode,
                     date,
                 );
+
                 if (!schedule) {
                     const actualUnits = dayActivities.reduce(
                         (sum: number, act: Activity) =>
@@ -237,6 +244,7 @@ export function analyzeScheduleActivityMismatches(
                             id: schedule.id,
                             multiple: schedule.multiple || false,
                             startDate: schedule.startDate,
+                            endDate: schedule.endDate,
                         },
                     });
                 }
@@ -310,6 +318,7 @@ export function analyzeScheduleActivityMismatches(
                                             multiple:
                                                 schedule.multiple || false,
                                             startDate: schedule.startDate,
+                                            endDate: schedule.endDate,
                                         },
                                     });
                                 }
@@ -340,7 +349,7 @@ export function analyzeScheduleActivityMismatches(
     Object.keys(mismatchesByPerson).forEach((personName: string) => {
         mismatchesByPerson[personName]!.sort(
             (a: ScheduleMismatch, b: ScheduleMismatch) => {
-                return new Date(a.date).getTime() - new Date(b.date).getTime();
+                return parseMDY(a.date).getTime() - parseMDY(b.date).getTime();
             },
         );
     });

@@ -38,6 +38,7 @@ interface ScheduleMismatch {
         id: number;
         multiple: boolean;
         startDate: string;
+        endDate: string;
     };
 }
 
@@ -60,6 +61,40 @@ export const ScheduleMismatches: React.FC<ScheduleMismatchesProps> = ({
     analysisStartDate,
     analysisEndDate,
 }: ScheduleMismatchesProps) => {
+    const formatShortMDY = (input: string): string => {
+        try {
+            if (!input) return "";
+            if (input.includes("-")) {
+                const iso = input.slice(0, 10);
+                const [yyyy, mm, dd] = iso.split("-");
+                const month = String(parseInt(mm || "1", 10)).padStart(2, "0");
+                const day = String(parseInt(dd || "1", 10)).padStart(2, "0");
+                const year = String(parseInt(yyyy || "2000", 10)).padStart(
+                    4,
+                    "0",
+                );
+                return `${month}/${day}/${year}`;
+            }
+            if (input.includes("/")) {
+                const [mm, dd, y] = input.split("/");
+                const month = String(parseInt(mm || "1", 10)).padStart(2, "0");
+                const day = String(parseInt(dd || "1", 10)).padStart(2, "0");
+                const yearNum = parseInt(y || "0", 10);
+                const fullYear =
+                    (y && y.length <= 2 ? 2000 + yearNum : yearNum) || 2000;
+                const year = String(fullYear).padStart(4, "0");
+                return `${month}/${day}/${year}`;
+            }
+            const d = new Date(input);
+            if (isNaN(d.getTime())) return input;
+            const month = String(d.getMonth() + 1).padStart(2, "0");
+            const day = String(d.getDate()).padStart(2, "0");
+            const year = String(d.getFullYear()).padStart(4, "0");
+            return `${month}/${day}/${year}`;
+        } catch {
+            return input;
+        }
+    };
     if (!mismatches || Object.keys(mismatches).length === 0) {
         return (
             <Card className="border-0 shadow-lg">
@@ -551,16 +586,40 @@ export const ScheduleMismatches: React.FC<ScheduleMismatchesProps> = ({
                                                                         : "No"}
                                                                 </span>
                                                             </div>
-                                                            <div className="col-span-2">
+                                                            <div>
                                                                 <span className="text-gray-600">
                                                                     Inicio:
                                                                 </span>{" "}
                                                                 <span className="font-medium">
-                                                                    {new Date(
-                                                                        mismatch.schedule.startDate,
-                                                                    ).toLocaleDateString(
-                                                                        "es-ES",
+                                                                    {formatShortMDY(
+                                                                        mismatch
+                                                                            .schedule
+                                                                            .startDate,
                                                                     )}
+                                                                </span>
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-gray-600">
+                                                                    Fin:
+                                                                </span>{" "}
+                                                                <span className="font-medium">
+                                                                    {(() => {
+                                                                        const end =
+                                                                            mismatch
+                                                                                .schedule
+                                                                                ?.endDate;
+                                                                        const isCurrent =
+                                                                            typeof end ===
+                                                                                "string" &&
+                                                                            end.startsWith(
+                                                                                "9999-",
+                                                                            );
+                                                                        return isCurrent
+                                                                            ? "actual"
+                                                                            : formatShortMDY(
+                                                                                  end as string,
+                                                                              );
+                                                                    })()}
                                                                 </span>
                                                             </div>
                                                         </div>
