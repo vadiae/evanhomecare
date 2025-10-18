@@ -617,7 +617,7 @@ export const ScheduleMismatches: React.FC<ScheduleMismatchesProps> = ({
                                                                         return isCurrent
                                                                             ? "actual"
                                                                             : formatShortMDY(
-                                                                                  end as string,
+                                                                                  end,
                                                                               );
                                                                     })()}
                                                                 </span>
