@@ -20,13 +20,10 @@ import { ServicesGroupedByType } from "../components/results/ServicesGroupedByTy
 import { WaiverValidationErrors } from "../components/results/WaiverValidationErrors";
 import { validAssociatedServices, validServiceCodes } from "./constants";
 import { type ConsumerAnalysisResult, type DataRow } from "./types";
-import {
-    type ClientSchedule,
-    type ProcessedData,
-    handleFileUpload,
-    analyzeConsumer,
-    analyzeScheduleActivityMismatches,
-} from "./utils/dataProcessing";
+import { type ClientSchedule, type ProcessedData } from "./utils/types";
+import { handleFileUpload } from "./utils/fileUtils";
+import { analyzeConsumer } from "./utils/analysis";
+import { analyzeScheduleActivityMismatches } from "./utils/scheduleMismatches";
 
 interface ScheduleApiResponse {
     schedules: ClientSchedule[];
