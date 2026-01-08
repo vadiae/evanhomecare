@@ -2,13 +2,17 @@
 
 import { Tabs, Tab } from "@heroui/react";
 import React, { useState } from "react";
-import { FiUsers, FiBarChart } from "react-icons/fi";
+import { FiUsers, FiBarChart, FiCalendar } from "react-icons/fi";
 import dynamic from "next/dynamic";
 import Analyzer from "~/modules/Analysis/analyzer/Analyzer";
 
 const UserData = dynamic(() => import("~/modules/Analysis/admin/UserData"), {
     ssr: false,
 });
+const SchedulesManager = dynamic(
+    () => import("~/modules/Analysis/admin/SchedulesManager"),
+    { ssr: false },
+);
 
 export default function AnalysisSection({
     user,
@@ -68,6 +72,17 @@ export default function AnalysisSection({
                                     }
                                 />
                             )}
+                            {user && user.role === "admin" && (
+                                <Tab
+                                    key="schedules"
+                                    title={
+                                        <div className="flex items-center gap-2">
+                                            <FiCalendar />
+                                            <span>Horarios</span>
+                                        </div>
+                                    }
+                                />
+                            )}
                         </Tabs>
 
                         {/* Tab Content */}
@@ -76,6 +91,10 @@ export default function AnalysisSection({
                         {activeTab === "userdata" &&
                             user &&
                             user.role === "admin" && <UserData />}
+
+                        {activeTab === "schedules" &&
+                            user &&
+                            user.role === "admin" && <SchedulesManager />}
                     </div>
                 </div>
             </div>

@@ -1,6 +1,5 @@
 import { QueryClient } from "@tanstack/react-query";
 import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import { type Metadata } from "next";
 import localFont from "next/font/local";
 import "./fonts.css";
@@ -82,7 +81,6 @@ export default function RootLayout({
         <html lang="en">
             <body className={`${myFont.variable}`}>
                 <Providers>{children}</Providers>
-                <SpeedInsights />
                 <Analytics />
             </body>
         </html>
