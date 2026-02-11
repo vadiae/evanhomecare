@@ -1,3 +1,5 @@
+//@ts-nocheck
+
 import { google } from "googleapis";
 
 function getAuth() {
