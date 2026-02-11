@@ -4,7 +4,7 @@ import { Button, Card, Input } from "@heroui/react";
 import axios from "axios";
 import { enqueueSnackbar } from "notistack";
 import React, { useState } from "react";
-import { FaLock, FaPlayCircle, FaArrowLeft } from "react-icons/fa";
+import { FaLock, FaArrowLeft } from "react-icons/fa";
 import { z } from "zod";
 import Spinner from "~/components/Spinner/Spinner";
 import AnalysisSection from "../sections/AnalysisSection";

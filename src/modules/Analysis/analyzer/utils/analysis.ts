@@ -22,14 +22,9 @@ export const analyzeConsumer = (
 
     const waiverCountByService = filteredRows.reduce(
         (acc: Record<string, number>, row: DataRow) => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            if (
-                areServiceCodesEqual((row as any)["Service Code"], "0000-WVR")
-            ) {
+            if (areServiceCodesEqual(row["Service Code"] || "", "0000-WVR")) {
                 const associatedService =
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    (row as any)["Associated Service"] || "Unknown";
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                    row["Associated Service"] || "Unknown";
                 acc[associatedService] = (acc[associatedService] || 0) + 1;
             }
             return acc;
@@ -53,15 +48,11 @@ export const analyzeConsumer = (
     const groupedByService = filteredData.rows.reduce(
         (acc: Record<string, DataRow[]>, row: DataRow) => {
             const rawServiceCode =
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                (row as any)["Service Code"] || "Not a 0000-WVR service";
+                row["Service Code"] || "Not a 0000-WVR service";
             const serviceCode = normalizeServiceCode(rawServiceCode);
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             if (!acc[serviceCode]) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 acc[serviceCode] = [] as DataRow[];
             }
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             acc[serviceCode]!.push(row);
             return acc;
         },
@@ -75,8 +66,7 @@ export const analyzeConsumer = (
         ) => {
             acc[serviceCode] = rows.reduce((total: number, row: DataRow) => {
                 const units = parseFloat(
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-                    (row as any).units || (row as any).Units || "0",
+                    (row.units || row.Units || "0").toString(),
                 );
                 return total + (isNaN(units) ? 0 : units);
             }, 0);
@@ -93,28 +83,19 @@ export const analyzeConsumer = (
 
     const groupedByAssociatedService = filteredData.rows.reduce(
         (acc: Record<string, DataRow[]>, row: DataRow) => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            if (
-                areServiceCodesEqual((row as any)["Service Code"], "0000-WVR")
-            ) {
+            if (areServiceCodesEqual(row["Service Code"] || "", "0000-WVR")) {
                 const associatedService =
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    (row as any)["Associated Service"] || "Unknown";
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                const date = (row as any).date || (row as any).Date;
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                const docType = (row as any)["Documentation Type"];
+                    row["Associated Service"] || "Unknown";
+                const date = row.date || row.Date;
+                const docType = row["Documentation Type"];
 
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 if (!acc[associatedService]) {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                     acc[associatedService] = [] as DataRow[];
                 }
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                (acc[associatedService] as any)!.push({
+                acc[associatedService]!.push({
+                    ...row,
                     date,
                     docType,
-                    ...(row as any),
                 });
             }
             return acc;

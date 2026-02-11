@@ -1,8 +1,5 @@
 import React from "react";
-import {
-    areServiceCodesEqual,
-    normalizeServiceCode,
-} from "../../analyzer/utils/serviceUtils";
+import { areServiceCodesEqual } from "../../analyzer/utils/serviceUtils";
 import { type ConsumerAnalysisResult } from "../../analyzer/types";
 
 interface ServicesGroupedByTypeProps {

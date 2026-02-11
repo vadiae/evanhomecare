@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import * as React from "react";
 interface EmploymentTemplateProps {
     name: string;
@@ -8,7 +9,7 @@ interface EmploymentTemplateProps {
 
 export const JobApplicationTemplate: React.FC<
     Readonly<EmploymentTemplateProps>
-> = ({ name, email, phone, message }) => (
+> = ({ name, email, phone: _phone, message: _message }) => (
     <div
         style={{
             fontFamily: "Arial, sans-serif",

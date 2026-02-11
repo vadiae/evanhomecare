@@ -10,6 +10,7 @@ export interface DataRow {
     "Documentation Type"?: string;
     Units?: string;
     Date?: string;
+    "Consumer Name"?: string;
     [key: string]: any;
 }
 

@@ -81,7 +81,12 @@ export function JobApplicationViewer({
                     const creationName = `${values.name}-id:${uuid}`;
 
                     const {
-                        data: { signature, timestamp, error },
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        data: {
+                            signature: _signature,
+                            timestamp,
+                            error: _error,
+                        },
                     } = await axios.post("/api/cloudinary", {
                         folder: `${process.env.NEXT_PUBLIC_CLOUDINARY_PDF_FOLDER}/${dateString}`,
                         upload_preset:
@@ -171,7 +176,8 @@ export function JobApplicationViewer({
             viewer.current,
         )
             .then((instance) => {
-                const { docViewer } = instance;
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const { docViewer: _docViewer } = instance;
                 instanceRef.current = instance;
             })
             .catch((error) => {

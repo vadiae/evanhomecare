@@ -14,7 +14,8 @@ export function EmploymentSection() {
     const [file, setFile] = React.useState<string>("");
     const [isFileLoading, setIsFileLoading] = React.useState<boolean>(false);
 
-    const response = useQuery({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _response = useQuery({
         queryKey: ["cloudinaryUrl"],
         queryFn: async () => {
             try {

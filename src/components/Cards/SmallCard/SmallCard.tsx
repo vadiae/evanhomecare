@@ -11,7 +11,7 @@ type SmallCardProps = {
     type?: string;
 };
 
-export function SmallCard({ img, title, text, type, alt }: SmallCardProps) {
+export function SmallCard({ img, title, text, alt }: SmallCardProps) {
     const [isHovered, setIsHovered] = useState(false);
 
     return (

@@ -85,7 +85,12 @@ export default function SchedulesManager() {
         id: string;
         name: string;
     } | null>(null);
-    const [editTarget, setEditTarget] = useState<Schedule | null>(null);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [_activeClient, _setActiveClient] = useState(activeClient);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [_editTarget, setEditTarget] = useState<Schedule | null>(null);
     const [deleteTarget, setDeleteTarget] = useState<Schedule | null>(null);
 
     const emptyForm: UpsertForm = {

@@ -36,6 +36,7 @@ import {
     parseSpreadsheetData,
     type ParsedSpreadsheetData,
 } from "./utils/spreadsheetParser";
+import { type DataRow } from "./types";
 
 interface AnalysisResult {
     id: string;
@@ -235,8 +236,9 @@ export default function Analyzer2() {
                 { name: string; dates: Map<string, Map<string, number>> }
             >();
 
-            jsonData.rows.forEach((row: any) => {
-                const consumerName = row.consumerName || "";
+            (jsonData.rows as DataRow[]).forEach((row) => {
+                const consumerName =
+                    row.consumerName || row["Consumer Name"] || "";
                 const idMatch = consumerName.match(/\(([^)]+)\)/);
                 const id = idMatch ? idMatch[1] : null;
 
@@ -244,7 +246,8 @@ export default function Analyzer2() {
 
                 const dateStr = row.Date || row.date;
                 const serviceCode = row["Service Code"] || row.serviceCode;
-                const units = parseFloat(row.Units || row.units || "0");
+                const unitsVal = row.Units || row.units || "0";
+                const units = parseFloat(String(unitsVal));
 
                 if (!dateStr || !serviceCode) return;
 
