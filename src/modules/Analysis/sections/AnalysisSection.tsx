@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { FiUsers, FiBarChart, FiCalendar } from "react-icons/fi";
 import dynamic from "next/dynamic";
 import Analyzer from "~/modules/Analysis/analyzer/Analyzer";
+import Analyzer2 from "~/modules/Analysis/analyzer/Analyzer2";
 
 const UserData = dynamic(() => import("~/modules/Analysis/admin/UserData"), {
     ssr: false,
@@ -19,7 +20,7 @@ export default function AnalysisSection({
 }: {
     user: { email: string; name: string; role: string } | null;
 }) {
-    const [activeTab, setActiveTab] = useState("analysis");
+    const [activeTab, setActiveTab] = useState("analysis2");
 
     return (
         <main>
@@ -52,6 +53,15 @@ export default function AnalysisSection({
                             color="primary"
                             variant="underlined"
                         >
+                            <Tab
+                                key="analysis2"
+                                title={
+                                    <div className="flex items-center gap-2">
+                                        <FiBarChart />
+                                        <span>Analysis 2.0</span>
+                                    </div>
+                                }
+                            />
                             <Tab
                                 key="analysis"
                                 title={
@@ -86,6 +96,7 @@ export default function AnalysisSection({
                         </Tabs>
 
                         {/* Tab Content */}
+                        {activeTab === "analysis2" && <Analyzer2 />}
                         {activeTab === "analysis" && <Analyzer />}
 
                         {activeTab === "userdata" &&

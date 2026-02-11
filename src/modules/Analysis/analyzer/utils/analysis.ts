@@ -1,3 +1,4 @@
+import { areServiceCodesEqual, normalizeServiceCode } from "./serviceUtils";
 import { type ConsumerAnalysisResult, type DataRow } from "../types";
 import { createGroupedByDay } from "./grouping";
 import { validateWaiverEntry } from "./validateWaiverEntry";
@@ -22,7 +23,9 @@ export const analyzeConsumer = (
     const waiverCountByService = filteredRows.reduce(
         (acc: Record<string, number>, row: DataRow) => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            if ((row as any)["Service Code"] === "0000-WVR") {
+            if (
+                areServiceCodesEqual((row as any)["Service Code"], "0000-WVR")
+            ) {
                 const associatedService =
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                     (row as any)["Associated Service"] || "Unknown";
@@ -49,9 +52,10 @@ export const analyzeConsumer = (
 
     const groupedByService = filteredData.rows.reduce(
         (acc: Record<string, DataRow[]>, row: DataRow) => {
-            const serviceCode =
+            const rawServiceCode =
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 (row as any)["Service Code"] || "Not a 0000-WVR service";
+            const serviceCode = normalizeServiceCode(rawServiceCode);
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             if (!acc[serviceCode]) {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -90,7 +94,9 @@ export const analyzeConsumer = (
     const groupedByAssociatedService = filteredData.rows.reduce(
         (acc: Record<string, DataRow[]>, row: DataRow) => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            if ((row as any)["Service Code"] === "0000-WVR") {
+            if (
+                areServiceCodesEqual((row as any)["Service Code"], "0000-WVR")
+            ) {
                 const associatedService =
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                     (row as any)["Associated Service"] || "Unknown";

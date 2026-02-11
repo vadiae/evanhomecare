@@ -1,3 +1,4 @@
+import { areServiceCodesEqual } from "./serviceUtils";
 import { validAssociatedServices, validDocumentationTypes } from "../constants";
 import { type DataRow } from "../types";
 
@@ -5,7 +6,7 @@ export function validateWaiverEntry(row: DataRow): {
     isValid: boolean;
     errors: string[];
 } {
-    if (row["Service Code"] === "0000-WVR") {
+    if (areServiceCodesEqual(row["Service Code"] || "", "0000-WVR")) {
         const associatedService = row["Associated Service"];
         const documentationType = row["Documentation Type"];
 

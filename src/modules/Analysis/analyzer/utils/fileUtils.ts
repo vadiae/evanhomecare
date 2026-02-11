@@ -16,6 +16,7 @@ export const processJsonData = async (
             distinctConsumerNames,
             startDate,
             endDate,
+            failedCustomerNames: jsonData.failedCustomerNames || [],
         };
     } catch (error) {
         console.error("Error processing JSON data:", error);

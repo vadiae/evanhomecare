@@ -12,6 +12,7 @@ export interface JsonData {
     recordsAmount?: number;
     startDate?: string;
     endDate?: string;
+    failedCustomerNames?: string[];
 }
 
 export interface ClientSchedule {
@@ -38,6 +39,7 @@ export interface ProcessedData {
     distinctConsumerNames: string[];
     startDate: string;
     endDate: string;
+    failedCustomerNames: string[];
 }
 
 export type { ConsumerAnalysisResult, DataRow };

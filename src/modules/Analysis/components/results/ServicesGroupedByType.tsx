@@ -1,4 +1,8 @@
 import React from "react";
+import {
+    areServiceCodesEqual,
+    normalizeServiceCode,
+} from "../../analyzer/utils/serviceUtils";
 import { type ConsumerAnalysisResult } from "../../analyzer/types";
 
 interface ServicesGroupedByTypeProps {
@@ -23,7 +27,9 @@ export const ServicesGroupedByType: React.FC<ServicesGroupedByTypeProps> = ({
                         <div
                             key={service}
                             className={`max-w-xs rounded-md p-2 text-sm ${
-                                !validServiceCodes.includes(service)
+                                !validServiceCodes.some((v) =>
+                                    areServiceCodesEqual(v, service),
+                                )
                                     ? "bg-red-50 text-red-600"
                                     : "bg-gray-50 text-gray-600 hover:bg-gray-100"
                             }`}

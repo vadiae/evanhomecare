@@ -1,3 +1,4 @@
+import { areServiceCodesEqual, normalizeServiceCode } from "./serviceUtils";
 import { type ClientSchedule } from "./types";
 
 interface Activity {
@@ -94,7 +95,7 @@ export function analyzeScheduleActivityMismatches(
 
         const applicableSchedules = clientSchedules.filter(
             (schedule: ClientSchedule) => {
-                if (schedule.service !== serviceCode) {
+                if (!areServiceCodesEqual(schedule.service, serviceCode)) {
                     return false;
                 }
 
@@ -128,7 +129,10 @@ export function analyzeScheduleActivityMismatches(
         const activitiesByDateService: Record<string, Activity[]> = {};
 
         activities.forEach((activity: Activity) => {
-            const key = `${activity.Date}_${activity["Service Code"]}`;
+            const normalizedServiceCode = normalizeServiceCode(
+                activity["Service Code"],
+            );
+            const key = `${activity.Date}_${normalizedServiceCode}`;
             if (!activitiesByDateService[key]) {
                 activitiesByDateService[key] = [];
             }
@@ -266,7 +270,10 @@ export function analyzeScheduleActivityMismatches(
                             );
                             return (
                                 dayNames[activityDayOfWeek] === dayName &&
-                                activity["Service Code"] === schedule.service
+                                areServiceCodesEqual(
+                                    activity["Service Code"],
+                                    schedule.service,
+                                )
                             );
                         },
                     );
@@ -296,8 +303,10 @@ export function analyzeScheduleActivityMismatches(
                                 const hasActivityOnDate = activities.some(
                                     (activity: Activity) =>
                                         activity.Date === dateString &&
-                                        activity["Service Code"] ===
+                                        areServiceCodesEqual(
+                                            activity["Service Code"],
                                             schedule.service,
+                                        ),
                                 );
 
                                 if (!hasActivityOnDate) {
