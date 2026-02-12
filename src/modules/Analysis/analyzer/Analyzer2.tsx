@@ -681,7 +681,7 @@ export default function Analyzer2() {
                                 startContent={<FiDownload />}
                                 onPress={() => {
                                     const csv = [
-                                        "ID,Name,Service,Date,Sheet,JSON,Status",
+                                        "ID,Name,Service,Date,Billed,iConnect,Status",
                                         ...results.map(
                                             (r) =>
                                                 `${r.id},"${r.name}","${
@@ -799,10 +799,10 @@ export default function Analyzer2() {
                                                                 Day
                                                             </TableColumn>
                                                             <TableColumn align="center">
-                                                                Sheet
+                                                                Billed
                                                             </TableColumn>
                                                             <TableColumn align="center">
-                                                                JSON
+                                                                iConnect
                                                             </TableColumn>
                                                         </TableHeader>
                                                         <TableBody>
