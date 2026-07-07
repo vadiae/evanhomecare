@@ -21,6 +21,32 @@ function getAuth() {
     });
 }
 
+function quoteSheetTitle(title: string): string {
+    return `'${title.replace(/'/g, "''")}'`;
+}
+
+async function getSpreadsheetSheets(spreadsheetId: string) {
+    const auth = getAuth();
+    const sheets = google.sheets({ version: "v4", auth });
+    const metadata = await sheets.spreadsheets.get({ spreadsheetId });
+    return metadata.data.sheets ?? [];
+}
+
+async function fetchSheetValuesByTitle(
+    spreadsheetId: string,
+    sheetTitle: string,
+) {
+    const auth = getAuth();
+    const sheets = google.sheets({ version: "v4", auth });
+
+    const response = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: quoteSheetTitle(sheetTitle),
+    });
+
+    return response.data.values;
+}
+
 export async function getSheetData(spreadsheetId: string, range: string) {
     const auth = getAuth();
     const sheets = google.sheets({ version: "v4", auth });
@@ -40,48 +66,56 @@ export async function getSheetData(spreadsheetId: string, range: string) {
     }
 }
 
+export async function getSheetDataWithName(
+    spreadsheetId: string,
+    sheetName: string,
+) {
+    try {
+        const allSheets = await getSpreadsheetSheets(spreadsheetId);
+        const availableNames = allSheets
+            .map((sheet) => sheet.properties?.title)
+            .filter((title): title is string => Boolean(title));
+
+        const matchedSheet = allSheets.find(
+            (sheet) => sheet.properties?.title === sheetName,
+        );
+
+        if (!matchedSheet?.properties?.title) {
+            throw new Error(
+                `Sheet "${sheetName}" not found. Available sheets: ${availableNames.join(", ")}`,
+            );
+        }
+
+        return fetchSheetValuesByTitle(
+            spreadsheetId,
+            matchedSheet.properties.title,
+        );
+    } catch (error: any) {
+        console.error("Error fetching from Google Sheets:", error);
+        throw new Error(
+            error.message || "Failed to fetch data from Google Sheets",
+        );
+    }
+}
+
 export async function getSheetDataWithGid(
     spreadsheetId: string,
     gid: number = 0,
 ) {
-    const auth = getAuth();
-    const sheets = google.sheets({ version: "v4", auth });
-
     try {
-        // 1. Get Spreadsheet Metadata to find the sheet name
-        const metadata = await sheets.spreadsheets.get({
-            spreadsheetId,
-        });
+        const allSheets = await getSpreadsheetSheets(spreadsheetId);
+        const sheet = allSheets.find((s) => s.properties?.sheetId === gid);
 
-        const sheet = metadata.data.sheets?.find(
-            (s) => s.properties?.sheetId === gid,
-        );
-
-        let range = "";
-        if (sheet && sheet.properties?.title) {
-            range = `'${sheet.properties.title}'`; // Quote the title in case of spaces
-        } else {
-            // Fallback to first sheet if GID not found, or throw?
-            // If GID 0 is not found (unlikely), use the first one.
-            if (metadata.data.sheets && metadata.data.sheets.length > 0) {
-                const firstSheet = metadata.data.sheets[0];
-                if (firstSheet.properties?.title) {
-                    range = `'${firstSheet.properties.title}'`;
-                }
-            }
+        let sheetTitle = sheet?.properties?.title;
+        if (!sheetTitle && allSheets.length > 0) {
+            sheetTitle = allSheets[0]?.properties?.title;
         }
 
-        if (!range) {
+        if (!sheetTitle) {
             throw new Error("Could not determine sheet name.");
         }
 
-        // 2. Fetch values
-        const response = await sheets.spreadsheets.values.get({
-            spreadsheetId,
-            range, // Fetch all data from that sheet
-        });
-
-        return response.data.values;
+        return fetchSheetValuesByTitle(spreadsheetId, sheetTitle);
     } catch (error: any) {
         console.error("Error fetching from Google Sheets:", error);
         throw new Error(

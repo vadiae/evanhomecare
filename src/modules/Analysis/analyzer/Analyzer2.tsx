@@ -9,6 +9,8 @@ import {
     CardBody,
     Chip,
     Input,
+    Select,
+    SelectItem,
     Table,
     TableBody,
     TableCell,
@@ -36,6 +38,10 @@ import {
     parseSpreadsheetData,
     type ParsedSpreadsheetData,
 } from "./utils/spreadsheetParser";
+import {
+    getDefaultSheetTabName,
+    getSheetTabOptions,
+} from "./utils/sheetTabOptions";
 import { type DataRow } from "./types";
 
 interface AnalysisResult {
@@ -50,10 +56,13 @@ interface AnalysisResult {
 }
 
 export default function Analyzer2() {
+    const sheetTabOptions = getSheetTabOptions();
+
     // Spreadsheet state
     const [url, setUrl] = useState(
-        "https://docs.google.com/spreadsheets/d/1jnUcqGQHB9JhvoaReOwqN418BqE-dGhElqg7oQAvgdE/edit?gid=853307044#gid=853307044",
+        "https://docs.google.com/spreadsheets/d/1jnUcqGQHB9JhvoaReOwqN418BqE-dGhElqg7oQAvgdE/edit",
     );
+    const [sheetName, setSheetName] = useState(getDefaultSheetTabName);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [results, setResults] = useState<AnalysisResult[]>([]);
@@ -110,7 +119,15 @@ export default function Analyzer2() {
         setResults([]);
 
         try {
-            const proxyUrl = `/api/proxy-sheet?url=${encodeURIComponent(url)}`;
+            if (!sheetName.trim()) {
+                throw new Error("Please enter the sheet tab name.");
+            }
+
+            const params = new URLSearchParams({
+                url,
+                sheetName: sheetName.trim(),
+            });
+            const proxyUrl = `/api/proxy-sheet?${params.toString()}`;
             const response = await fetch(proxyUrl);
             if (!response.ok) {
                 const errData = (await response.json()) as { error?: string };
@@ -572,6 +589,23 @@ export default function Analyzer2() {
                                     </span>
                                 }
                             />
+                            <Select
+                                aria-label="Sheet tab"
+                                selectedKeys={[sheetName]}
+                                onSelectionChange={(keys) => {
+                                    const selected = Array.from(keys)[0];
+                                    if (selected) {
+                                        setSheetName(String(selected));
+                                    }
+                                }}
+                                labelPlacement="outside"
+                                label="Sheet tab"
+                                placeholder="Select a sheet tab"
+                            >
+                                {sheetTabOptions.map((option) => (
+                                    <SelectItem key={option}>{option}</SelectItem>
+                                ))}
+                            </Select>
                             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                                 <Button
                                     onPress={handleParseSpreadsheet}

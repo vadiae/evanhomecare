@@ -1,11 +1,15 @@
 //@ts-nocheck
 
 import { NextRequest, NextResponse } from "next/server";
-import { getSheetData } from "~/lib/googleSheets";
+import {
+    getSheetDataWithGid,
+    getSheetDataWithName,
+} from "~/lib/googleSheets";
 
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const url = searchParams.get("url");
+    const sheetName = searchParams.get("sheetName")?.trim();
 
     if (!url) {
         return NextResponse.json({ error: "URL is required" }, { status: 400 });
@@ -21,10 +25,12 @@ export async function GET(request: NextRequest) {
     const spreadsheetId = match[1];
 
     try {
-        const gidMatch = url.match(/[#&]gid=([0-9]+)/);
-        const gid = gidMatch ? parseInt(gidMatch[1]) : 0;
-
-        const rows = await getSheetDataWithGid(spreadsheetId, gid);
+        const rows = sheetName
+            ? await getSheetDataWithName(spreadsheetId, sheetName)
+            : await getSheetDataWithGid(
+                  spreadsheetId,
+                  parseGidFromUrl(url) ?? 0,
+              );
 
         return NextResponse.json({ rows });
     } catch (error: any) {
@@ -32,4 +38,7 @@ export async function GET(request: NextRequest) {
     }
 }
 
-import { getSheetDataWithGid } from "~/lib/googleSheets";
+function parseGidFromUrl(url: string): number | null {
+    const gidMatch = url.match(/[#&?]gid=([0-9]+)/);
+    return gidMatch ? parseInt(gidMatch[1], 10) : null;
+}
